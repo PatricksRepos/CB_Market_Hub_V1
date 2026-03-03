@@ -4,34 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\PostImage;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    public function __construct()
+    public function index(Request $request)
     {
-        $this->middleware(['auth','verified']);
-    }
-
-    public function index()
-    {
-        $posts = Post::query()
+        $query = Post::query()
             ->where('is_hidden', false)
-            ->latest()
-            ->paginate(20);
+            ->with(['category', 'user', 'images']);
 
-        return view('posts.index', compact('posts'));
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->integer('category'));
+        }
+
+        $posts = $query->latest()->paginate(20)->withQueryString();
+
+        $categories = Category::where('is_active', true)->orderBy('name')->get();
+
+        return view('posts.index', compact('posts', 'categories'));
     }
 
     public function create()
     {
-        return view('posts.create');
+        $categories = Category::where('is_active', true)->orderBy('name')->get();
+        return view('posts.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
+            'category_id' => 'nullable|exists:categories,id',
             'type' => 'required|in:marketplace,business,discussion',
             'title' => 'required|string|max:180',
             'body' => 'required|string',
@@ -46,6 +51,7 @@ class PostController extends Controller
 
         $data['user_id'] = $request->user()->id;
         $data['is_anonymous'] = (bool)($data['is_anonymous'] ?? false);
+
         if ($data['is_anonymous'] && empty($data['anonymous_name'])) {
             $data['anonymous_name'] = 'Anon';
         }
@@ -56,7 +62,11 @@ class PostController extends Controller
             $i = 0;
             foreach ($request->file('images') as $img) {
                 $path = $img->store('post-images', 'public');
-                PostImage::create(['post_id' => $post->id, 'path' => $path, 'sort_order' => $i++]);
+                PostImage::create([
+                    'post_id' => $post->id,
+                    'path' => $path,
+                    'sort_order' => $i++,
+                ]);
             }
         }
 
@@ -66,23 +76,35 @@ class PostController extends Controller
     public function show(Post $post)
     {
         abort_if($post->is_hidden, 404);
-        $post->load(['images','user']);
+
+        $post->load(['images', 'user', 'category']);
+
         return view('posts.show', compact('post'));
     }
 
     public function edit(Post $post)
     {
         $user = request()->user();
-        abort_unless($user->id === $post->user_id || $user->hasRole('admin') || $user->hasRole('moderator'), 403);
-        return view('posts.edit', compact('post'));
+        abort_unless(
+            $user->id === $post->user_id || $user->hasRole('admin') || $user->hasRole('moderator'),
+            403
+        );
+
+        $categories = Category::where('is_active', true)->orderBy('name')->get();
+
+        return view('posts.edit', compact('post', 'categories'));
     }
 
     public function update(Request $request, Post $post)
     {
         $user = $request->user();
-        abort_unless($user->id === $post->user_id || $user->hasRole('admin') || $user->hasRole('moderator'), 403);
+        abort_unless(
+            $user->id === $post->user_id || $user->hasRole('admin') || $user->hasRole('moderator'),
+            403
+        );
 
         $data = $request->validate([
+            'category_id' => 'nullable|exists:categories,id',
             'type' => 'required|in:marketplace,business,discussion',
             'title' => 'required|string|max:180',
             'body' => 'required|string',
@@ -96,6 +118,7 @@ class PostController extends Controller
         ]);
 
         $data['is_anonymous'] = (bool)($data['is_anonymous'] ?? false);
+
         if ($data['is_anonymous'] && empty($data['anonymous_name'])) {
             $data['anonymous_name'] = 'Anon';
         }
@@ -104,9 +127,14 @@ class PostController extends Controller
 
         if ($request->hasFile('images')) {
             $i = (int)($post->images()->max('sort_order') ?? -1) + 1;
+
             foreach ($request->file('images') as $img) {
                 $path = $img->store('post-images', 'public');
-                PostImage::create(['post_id' => $post->id, 'path' => $path, 'sort_order' => $i++]);
+                PostImage::create([
+                    'post_id' => $post->id,
+                    'path' => $path,
+                    'sort_order' => $i++,
+                ]);
             }
         }
 
@@ -116,12 +144,17 @@ class PostController extends Controller
     public function destroy(Request $request, Post $post)
     {
         $user = $request->user();
-        abort_unless($user->id === $post->user_id || $user->hasRole('admin') || $user->hasRole('moderator'), 403);
+        abort_unless(
+            $user->id === $post->user_id || $user->hasRole('admin') || $user->hasRole('moderator'),
+            403
+        );
 
         $post->load('images');
+
         foreach ($post->images as $img) {
             Storage::disk('public')->delete($img->path);
         }
+
         $post->delete();
 
         return redirect()->route('posts.index');

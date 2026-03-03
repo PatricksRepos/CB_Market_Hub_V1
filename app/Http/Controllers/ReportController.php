@@ -6,13 +6,7 @@ use App\Models\Report;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
-{
-    public function __construct()
-    {
-        $this->middleware(['auth','verified']);
-    }
-
-    public function store(Request $request)
+{public function store(Request $request)
     {
         $data = $request->validate([
             'reportable_type' => 'required|in:post',

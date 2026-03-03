@@ -1,16 +1,55 @@
 <x-app-layout>
-  <x-slot name="header"><h2 class="font-semibold text-xl">Marketplace & Posts</h2></x-slot>
-  <div class="p-6">
-    <a class="underline" href="{{ route('posts.create') }}">Create Post</a>
-    <div class="mt-4 space-y-3">
-      @foreach($posts as $post)
-        <div class="p-4 border rounded">
-          <div class="text-sm opacity-70">{{ $post->type }} @if($post->is_promoted) • PROMOTED @endif</div>
-          <a class="text-lg underline" href="{{ route('posts.show',$post) }}">{{ $post->title }}</a>
-          <div class="text-sm opacity-70">{{ $post->location }} @if($post->price) • ${{ $post->price }} @endif</div>
-        </div>
-      @endforeach
+  <x-slot name="header">
+    <h2 class="font-semibold text-xl">Cape Breton Community Marketplace</h2>
+  </x-slot>
+
+  <div class="p-6 space-y-4">
+    <div class="flex items-center gap-4">
+      @auth
+        <a class="underline" href="{{ route('posts.create') }}">Create Post</a>
+      @else
+        <a class="underline" href="{{ route('login') }}">Login to Post</a>
+      @endauth
+
+      <a class="underline" href="/admin">Admin</a>
     </div>
-    <div class="mt-6">{{ $posts->links() }}</div>
+
+    <form method="GET" class="flex gap-2 items-center">
+      <select name="category" class="border rounded">
+        <option value="">All Categories</option>
+        @foreach($categories as $cat)
+          <option value="{{ $cat->id }}" @selected(request('category') == $cat->id)>{{ $cat->name }}</option>
+        @endforeach
+      </select>
+
+      <button class="px-3 py-1 border rounded">Filter</button>
+
+      @if(request('category'))
+        <a class="underline" href="{{ route('posts.index') }}">Clear</a>
+      @endif
+    </form>
+
+    <div class="space-y-3">
+      @forelse($posts as $post)
+        <div class="p-4 border rounded">
+          <div class="text-sm opacity-70">
+            {{ $post->type }}
+            @if($post->category) • {{ $post->category->name }} @endif
+            @if($post->is_promoted) • PROMOTED @endif
+          </div>
+
+          <a class="text-lg underline" href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
+
+          <div class="text-sm opacity-70">
+            @if($post->location) {{ $post->location }} @endif
+            @if($post->price) • ${{ $post->price }} @endif
+          </div>
+        </div>
+      @empty
+        <div class="p-4 border rounded opacity-70">No posts yet. Be the first to create one.</div>
+      @endforelse
+    </div>
+
+    <div>{{ $posts->links() }}</div>
   </div>
 </x-app-layout>
