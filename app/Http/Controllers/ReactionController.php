@@ -9,6 +9,7 @@ use App\Models\PollComment;
 use App\Models\Post;
 use App\Models\Reaction;
 use App\Models\Suggestion;
+use App\Support\Reactions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -27,6 +28,10 @@ class ReactionController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if (!Reactions::isEnabled()) {
+            return back()->with('status', 'Reactions are not available yet. Please run migrations.');
+        }
+
         $data = $request->validate([
             'type' => ['required', Rule::in(array_keys(self::REACTABLE_MODELS))],
             'id' => ['required', 'integer', 'min:1'],

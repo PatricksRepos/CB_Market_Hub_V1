@@ -5,7 +5,10 @@
 
 @php
     $allowedEmojis = ['👍', '❤️', '😂', '😮', '🎉'];
-    $reactions = $model->relationLoaded('reactions') ? $model->reactions : $model->reactions()->get(['id', 'user_id', 'emoji']);
+    $reactionsEnabled = \App\Support\Reactions::isEnabled();
+    $reactions = $reactionsEnabled
+        ? ($model->relationLoaded('reactions') ? $model->reactions : $model->reactions()->get(['id', 'user_id', 'emoji']))
+        : collect();
 
     $reactionCounts = collect($allowedEmojis)
         ->mapWithKeys(fn (string $emoji) => [$emoji => 0])
@@ -15,6 +18,7 @@
     $myReaction = auth()->check() ? $reactions->firstWhere('user_id', auth()->id())?->emoji : null;
 @endphp
 
+@if ($reactionsEnabled)
 <div class="mt-4 flex flex-wrap items-center gap-2">
     @foreach ($allowedEmojis as $emoji)
         @php
@@ -44,3 +48,4 @@
         @endauth
     @endforeach
 </div>
+@endif

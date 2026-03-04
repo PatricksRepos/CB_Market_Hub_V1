@@ -6,6 +6,7 @@ use App\Models\Suggestion;
 use App\Models\SuggestionVote;
 use App\Models\SuggestionReport;
 use Illuminate\Http\Request;
+use App\Support\Reactions;
 
 class SuggestionController extends Controller
 {
@@ -27,7 +28,7 @@ class SuggestionController extends Controller
 
     public function show(Suggestion $suggestion, Request $request)
     {
-        $suggestion->load(['user', 'reactions'])->loadCount('votes');
+        $suggestion->load(array_filter(['user', Reactions::isEnabled() ? 'reactions' : null]))->loadCount('votes');
 
         $hasVoted = false;
         if ($request->user()) {

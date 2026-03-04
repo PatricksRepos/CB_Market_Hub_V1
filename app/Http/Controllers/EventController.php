@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use App\Support\Reactions;
 
 class EventController extends Controller
 {
@@ -25,7 +26,7 @@ class EventController extends Controller
 
     public function show(Event $event, Request $request): View
     {
-        $event->load(['user', 'rsvps.user', 'reactions']);
+        $event->load(array_filter(['user', 'rsvps.user', Reactions::isEnabled() ? 'reactions' : null]));
 
         $my = null;
         if ($request->user()) {
