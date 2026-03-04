@@ -97,6 +97,7 @@ class ReactFeedEndpointTest extends TestCase
         $response->assertJsonStructure([
             'type',
             'q',
+            'pagination' => ['page', 'per_page', 'total', 'has_more'],
             'items' => [
                 [
                     'type',
@@ -158,6 +159,47 @@ class ReactFeedEndpointTest extends TestCase
         $this->assertCount(1, $items);
         $this->assertSame('post', $items[0]['type']);
         $this->assertSame('Antenna tuning guide', $items[0]['title']);
+    }
+
+
+
+    public function test_react_feed_endpoint_returns_pagination_metadata_and_pages(): void
+    {
+        $user = User::factory()->create();
+
+        for ($i = 1; $i <= 8; $i++) {
+            Post::query()->create([
+                'user_id' => $user->id,
+                'type' => 'discussion',
+                'title' => "Post {$i}",
+                'body' => 'Body',
+                'created_at' => now()->subMinutes(30 - $i),
+                'updated_at' => now()->subMinutes(30 - $i),
+            ]);
+
+            Poll::query()->create([
+                'user_id' => $user->id,
+                'question' => "Poll {$i}",
+                'is_active' => true,
+                'starts_at' => now()->subDay(),
+                'ends_at' => now()->addDay(),
+                'results_visibility' => 'public',
+                'created_at' => now()->subMinutes(60 - $i),
+                'updated_at' => now()->subMinutes(60 - $i),
+            ]);
+        }
+
+        $pageOne = $this->getJson(route('react.feed', ['page' => 1, 'per_page' => 5]));
+        $pageOne->assertOk();
+        $this->assertCount(5, $pageOne->json('items'));
+        $pageOne->assertJsonPath('pagination.page', 1);
+        $pageOne->assertJsonPath('pagination.per_page', 5);
+        $pageOne->assertJsonPath('pagination.has_more', true);
+
+        $pageTwo = $this->getJson(route('react.feed', ['page' => 2, 'per_page' => 5]));
+        $pageTwo->assertOk();
+        $this->assertCount(5, $pageTwo->json('items'));
+        $pageTwo->assertJsonPath('pagination.page', 2);
     }
 
     public function test_react_feed_endpoint_can_filter_comment_types(): void

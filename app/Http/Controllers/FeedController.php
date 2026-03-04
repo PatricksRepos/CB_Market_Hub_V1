@@ -51,12 +51,21 @@ class FeedController extends Controller
     {
         $search = trim((string) $request->string('q', ''));
         $selectedType = $this->normalizeFeedType((string) $request->string('type', 'all'));
+        $page = max(1, (int) $request->integer('page', 1));
+        $perPage = max(1, min(30, (int) $request->integer('per_page', 20)));
 
-        $items = $this->collectFeedItems(false)
+        $filteredItems = $this->collectFeedItems(false)
             ->when($selectedType !== 'all', fn (Collection $collection) => $collection->where('type', $selectedType))
             ->when($search !== '', fn (Collection $collection) => $collection->filter(fn (array $item) => $this->matchesSearch($item, $search)))
             ->sortByDesc('at')
-            ->take(20)
+            ->values();
+
+        $total = $filteredItems->count();
+        $offset = ($page - 1) * $perPage;
+
+        $items = $filteredItems
+            ->slice($offset, $perPage)
+            ->values()
             ->map(fn (array $item) => $this->mapReactFeedItem($item))
             ->values();
 
@@ -64,6 +73,12 @@ class FeedController extends Controller
             'type' => $selectedType,
             'q' => $search,
             'items' => $items,
+            'pagination' => [
+                'page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'has_more' => ($offset + $items->count()) < $total,
+            ],
         ]);
     }
 

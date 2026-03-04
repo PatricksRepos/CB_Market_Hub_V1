@@ -41,34 +41,45 @@
             const [type, setType] = useState(params.get('type') || 'all');
             const [q, setQ] = useState(params.get('q') || '');
             const [items, setItems] = useState([]);
+            const [page, setPage] = useState(1);
+            const [hasMore, setHasMore] = useState(false);
             const [loading, setLoading] = useState(true);
             const [error, setError] = useState('');
 
-            const fetchFeed = (nextType, nextQ) => {
+            const fetchFeed = (nextType, nextQ, nextPage, append = false) => {
                 setLoading(true);
                 const query = new URLSearchParams();
 
                 if (nextType !== 'all') query.set('type', nextType);
                 if (nextQ.trim()) query.set('q', nextQ.trim());
+                query.set('page', String(nextPage));
+                query.set('per_page', '10');
 
                 const queryString = query.toString();
-                const url = queryString ? `/labs/react/feed?${queryString}` : '/labs/react/feed';
-                window.history.replaceState({}, '', queryString ? `/labs/feed-react?${queryString}` : '/labs/feed-react');
+                const apiUrl = `/labs/react/feed?${queryString}`;
 
-                return fetch(url)
+                const pageUrlParams = new URLSearchParams();
+                if (nextType !== 'all') pageUrlParams.set('type', nextType);
+                if (nextQ.trim()) pageUrlParams.set('q', nextQ.trim());
+                window.history.replaceState({}, '', pageUrlParams.toString() ? `/labs/feed-react?${pageUrlParams.toString()}` : '/labs/feed-react');
+
+                return fetch(apiUrl)
                     .then((res) => {
                         if (!res.ok) throw new Error('Could not load feed');
                         return res.json();
                     })
                     .then((data) => {
-                        setItems(data.items || []);
+                        const nextItems = data.items || [];
+                        setItems((prev) => append ? [...prev, ...nextItems] : nextItems);
+                        setHasMore(Boolean(data.pagination && data.pagination.has_more));
+                        setPage(nextPage);
                     })
                     .catch(() => setError('Failed to load feed items.'))
                     .finally(() => setLoading(false));
             };
 
             useEffect(() => {
-                fetchFeed(type, q);
+                fetchFeed(type, q, 1, false);
             }, []);
 
             return React.createElement(
@@ -79,7 +90,7 @@
                         React.createElement('div', null,
                             React.createElement('p', { className: 'text-sm font-semibold uppercase tracking-wider text-indigo-700' }, 'React Feed (Implementation Track)'),
                             React.createElement('h1', { className: 'mt-1 text-3xl font-bold' }, 'Community Feed in React'),
-                            React.createElement('p', { className: 'mt-2 text-sm text-slate-600' }, 'This is the real migration step: React rendering actual feed cards from Laravel JSON.')
+                            React.createElement('p', { className: 'mt-2 text-sm text-slate-600' }, 'Now with pagination and load-more behavior using Laravel JSON metadata.')
                         ),
                         React.createElement('a', { href: '/', className: 'rounded-md border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-50' }, 'Open Blade feed')
                     ),
@@ -89,7 +100,7 @@
                         onSubmit: (e) => {
                             e.preventDefault();
                             setError('');
-                            fetchFeed(type, q);
+                            fetchFeed(type, q, 1, false);
                         },
                     },
                         React.createElement('div', { className: 'grid gap-3 md:grid-cols-4' },
@@ -114,11 +125,20 @@
                     error && React.createElement('p', { className: 'mt-4 text-sm text-red-600' }, error),
 
                     React.createElement('section', { className: 'mt-6 grid gap-4 md:grid-cols-2' },
-                        ...(loading
+                        ...(loading && items.length === 0
                             ? [React.createElement('p', { key: 'loading', className: 'text-sm text-slate-600' }, 'Loading feed...')]
                             : items.length
                                 ? items.map((item, i) => React.createElement(FeedCard, { key: `${item.type}-${i}`, item }))
                                 : [React.createElement('p', { key: 'empty', className: 'text-sm text-slate-600' }, 'No items for these filters.')])
+                    ),
+
+                    hasMore && React.createElement('div', { className: 'mt-6' },
+                        React.createElement('button', {
+                            className: 'rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:opacity-60',
+                            onClick: () => fetchFeed(type, q, page + 1, true),
+                            disabled: loading,
+                            type: 'button',
+                        }, loading ? 'Loading...' : 'Load more')
                     )
                 )
             );
