@@ -77,6 +77,8 @@ class ReactFeedEndpointTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonStructure([
+            'type',
+            'q',
             'items' => [
                 [
                     'type',
@@ -96,5 +98,45 @@ class ReactFeedEndpointTest extends TestCase
         $this->assertContains('event', array_column($items, 'type'));
         $this->assertContains('suggestion', array_column($items, 'type'));
         $this->assertContains('listing', array_column($items, 'type'));
+    }
+
+    public function test_react_feed_endpoint_applies_type_and_search_filters(): void
+    {
+        $user = User::factory()->create();
+
+        Post::query()->create([
+            'user_id' => $user->id,
+            'type' => 'discussion',
+            'title' => 'Antenna tuning guide',
+            'body' => 'SWR setup tips',
+        ]);
+
+        Post::query()->create([
+            'user_id' => $user->id,
+            'type' => 'discussion',
+            'title' => 'General channel chat',
+            'body' => 'No search keyword here',
+        ]);
+
+        Poll::query()->create([
+            'user_id' => $user->id,
+            'question' => 'Favorite CB channel?',
+            'is_active' => true,
+            'starts_at' => now(),
+            'ends_at' => now()->addDay(),
+            'results_visibility' => 'public',
+        ]);
+
+        $response = $this->getJson(route('react.feed', ['type' => 'post', 'q' => 'antenna']));
+
+        $response->assertOk();
+        $response->assertJsonPath('type', 'post');
+        $response->assertJsonPath('q', 'antenna');
+
+        $items = $response->json('items');
+
+        $this->assertCount(1, $items);
+        $this->assertSame('post', $items[0]['type']);
+        $this->assertSame('Antenna tuning guide', $items[0]['title']);
     }
 }
