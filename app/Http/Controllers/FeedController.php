@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ChatMessage;
 use App\Models\Event;
 use App\Models\Listing;
 use App\Models\Poll;
@@ -44,112 +43,6 @@ class FeedController extends Controller
                 'listing' => 'Listings',
                 'post_comment' => 'Post comments',
                 'poll_comment' => 'Poll comments',
-            ],
-        ]);
-    }
-
-    public function reactFeed(Request $request)
-    {
-        $search = trim((string) $request->string('q', ''));
-        $selectedType = $this->normalizeFeedType((string) $request->string('type', 'all'));
-        $page = max(1, (int) $request->integer('page', 1));
-        $perPage = max(1, min(30, (int) $request->integer('per_page', 20)));
-
-        $filteredItems = $this->collectFeedItems(false)
-            ->when($selectedType !== 'all', fn (Collection $collection) => $collection->where('type', $selectedType))
-            ->when($search !== '', fn (Collection $collection) => $collection->filter(fn (array $item) => $this->matchesSearch($item, $search)))
-            ->sortByDesc('at')
-            ->values();
-
-        $total = $filteredItems->count();
-        $offset = ($page - 1) * $perPage;
-
-        $items = $filteredItems
-            ->slice($offset, $perPage)
-            ->values()
-            ->map(fn (array $item) => $this->mapReactFeedItem($item))
-            ->values();
-
-        return response()->json([
-            'type' => $selectedType,
-            'q' => $search,
-            'items' => $items,
-            'pagination' => [
-                'page' => $page,
-                'per_page' => $perPage,
-                'total' => $total,
-                'has_more' => ($offset + $items->count()) < $total,
-            ],
-        ]);
-    }
-
-    public function reactSummary()
-    {
-        return response()->json([
-            'posts' => Post::query()->count(),
-            'polls' => Poll::query()->count(),
-            'events' => Event::query()->where('is_public', true)->count(),
-            'suggestions' => Suggestion::query()->count(),
-            'listings' => Listing::query()->where('is_active', true)->count(),
-        ]);
-    }
-
-
-    public function reactSiteOverview()
-    {
-        return response()->json([
-            'counts' => [
-                'feed' => $this->collectFeedItems(false)->count(),
-                'posts' => Post::query()->count(),
-                'polls' => Poll::query()->count(),
-                'marketplace' => Listing::query()->where('is_active', true)->count(),
-                'events' => Event::query()->where('is_public', true)->count(),
-                'suggestions' => Suggestion::query()->count(),
-                'chat' => ChatMessage::query()->count(),
-            ],
-            'sections' => [
-                'posts' => Post::query()->latest()->with('user')->take(5)->get()->map(fn (Post $post) => [
-                    'title' => (string) ($post->title ?? 'Post #'.$post->id),
-                    'excerpt' => Str::limit((string) ($post->body ?? ''), 120),
-                    'author' => (string) optional($post->user)->name,
-                    'href' => route('posts.show', $post),
-                    'created_at' => optional($post->created_at)->toIso8601String(),
-                ])->values(),
-                'polls' => Poll::query()->latest()->with('user')->take(5)->get()->map(fn (Poll $poll) => [
-                    'title' => (string) ($poll->question ?? 'Poll #'.$poll->id),
-                    'excerpt' => 'Community poll',
-                    'author' => (string) optional($poll->user)->name,
-                    'href' => route('polls.show', $poll),
-                    'created_at' => optional($poll->created_at)->toIso8601String(),
-                ])->values(),
-                'marketplace' => Listing::query()->where('is_active', true)->latest()->with('user')->take(5)->get()->map(fn (Listing $listing) => [
-                    'title' => (string) ($listing->title ?? 'Listing #'.$listing->id),
-                    'excerpt' => Str::limit((string) ($listing->body ?? ''), 120),
-                    'author' => (string) optional($listing->user)->name,
-                    'href' => route('listings.show', $listing),
-                    'created_at' => optional($listing->created_at)->toIso8601String(),
-                ])->values(),
-                'events' => Event::query()->where('is_public', true)->latest()->with('user')->take(5)->get()->map(fn (Event $event) => [
-                    'title' => (string) ($event->title ?? 'Event #'.$event->id),
-                    'excerpt' => Str::limit((string) ($event->description ?? ''), 120),
-                    'author' => (string) optional($event->user)->name,
-                    'href' => route('events.show', $event),
-                    'created_at' => optional($event->created_at)->toIso8601String(),
-                ])->values(),
-                'suggestions' => Suggestion::query()->latest()->with('user')->take(5)->get()->map(fn (Suggestion $suggestion) => [
-                    'title' => (string) ($suggestion->title ?? 'Suggestion #'.$suggestion->id),
-                    'excerpt' => Str::limit((string) ($suggestion->body ?? ''), 120),
-                    'author' => (string) optional($suggestion->user)->name,
-                    'href' => route('suggestions.show', $suggestion),
-                    'created_at' => optional($suggestion->created_at)->toIso8601String(),
-                ])->values(),
-                'chat' => ChatMessage::query()->latest()->with('user')->take(5)->get()->map(fn (ChatMessage $message) => [
-                    'title' => 'Chat message',
-                    'excerpt' => Str::limit((string) ($message->body ?? ''), 120),
-                    'author' => (string) optional($message->user)->name,
-                    'href' => route('chat.index'),
-                    'created_at' => optional($message->created_at)->toIso8601String(),
-                ])->values(),
             ],
         ]);
     }
@@ -199,34 +92,6 @@ class FeedController extends Controller
             ->concat($listings->map(fn (Listing $listing) => ['type' => 'listing', 'at' => $listing->created_at, 'data' => $listing]))
             ->concat($postComments->map(fn (PostComment $comment) => ['type' => 'post_comment', 'at' => $comment->created_at, 'data' => $comment]))
             ->concat($pollComments->map(fn (PollComment $comment) => ['type' => 'poll_comment', 'at' => $comment->created_at, 'data' => $comment]));
-    }
-
-    private function mapReactFeedItem(array $item): array
-    {
-        $type = (string) $item['type'];
-        $data = $item['data'];
-
-        return match ($type) {
-            'post' => $this->reactCard($type, (string) ($data->title ?? ''), (string) ($data->body ?? ''), (string) optional($data->user)->name, $data->created_at),
-            'poll' => $this->reactCard($type, (string) ($data->question ?? ''), 'Community poll', (string) optional($data->user)->name, $data->created_at),
-            'event' => $this->reactCard($type, (string) ($data->title ?? ''), (string) ($data->description ?? ''), (string) optional($data->user)->name, $data->created_at),
-            'suggestion' => $this->reactCard($type, (string) ($data->title ?? ''), (string) ($data->body ?? ''), (string) optional($data->user)->name, $data->created_at),
-            'listing' => $this->reactCard($type, (string) ($data->title ?? ''), (string) ($data->body ?? ''), (string) optional($data->user)->name, $data->created_at),
-            'post_comment' => $this->reactCard($type, 'Comment on post', (string) ($data->body ?? ''), (string) optional($data->user)->name, $data->created_at),
-            'poll_comment' => $this->reactCard($type, 'Comment on poll', (string) ($data->body ?? ''), (string) optional($data->user)->name, $data->created_at),
-            default => $this->reactCard($type, 'Feed item', '', '', null),
-        };
-    }
-
-    private function reactCard(string $type, string $title, string $body, string $author, $createdAt): array
-    {
-        return [
-            'type' => $type,
-            'title' => $title,
-            'excerpt' => Str::limit($body, 120),
-            'author' => $author,
-            'created_at' => optional($createdAt)->toIso8601String(),
-        ];
     }
 
     private function normalizeFeedType(string $selectedType): string
