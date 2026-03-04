@@ -22,6 +22,7 @@ Route::get('/', [FeedController::class, 'index'])->name('feed.index');
 
 Route::prefix('labs')->group(function () {
     Route::view('/react', 'react.index')->name('react.index');
+    Route::view('/feed-react', 'react.feed')->name('react.feed-page');
     Route::get('/react/summary', [FeedController::class, 'reactSummary'])->name('react.summary');
     Route::get('/react/feed', [FeedController::class, 'reactFeed'])->name('react.feed');
 });
