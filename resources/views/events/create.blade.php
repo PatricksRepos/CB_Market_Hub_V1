@@ -17,7 +17,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('events.store') }}" class="space-y-4">
+                <form method="POST" action="{{ route('events.store') }}" enctype="multipart/form-data" class="space-y-4">
                     @csrf
 
                     <div>
@@ -33,6 +33,12 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Location</label>
                         <input name="location" value="{{ old('location') }}" class="mt-1 w-full rounded border-gray-300" />
+                    </div>
+
+                    <div>
+                        <label for="event_image" class="block text-sm font-medium text-gray-700">Event image (optional)</label>
+                        <input id="event_image" type="file" name="image" accept="image/*" class="mt-1 block w-full text-sm text-gray-600" />
+                        <img id="event_image_preview" class="mt-3 hidden h-36 w-full max-w-xs rounded border object-cover" alt="Selected event image preview" />
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -53,4 +59,28 @@
             </div>
         </div>
     </div>
+
+    <script>
+        (() => {
+            const imageInput = document.getElementById('event_image');
+            const imagePreview = document.getElementById('event_image_preview');
+
+            if (!imageInput || !imagePreview) {
+                return;
+            }
+
+            imageInput.addEventListener('change', () => {
+                const file = imageInput.files?.[0];
+
+                if (!file || !file.type.startsWith('image/')) {
+                    imagePreview.src = '';
+                    imagePreview.classList.add('hidden');
+                    return;
+                }
+
+                imagePreview.src = URL.createObjectURL(file);
+                imagePreview.classList.remove('hidden');
+            });
+        })();
+    </script>
 </x-app-layout>

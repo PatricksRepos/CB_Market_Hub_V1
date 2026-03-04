@@ -19,12 +19,20 @@
             @forelse($events as $e)
                 <div class="bg-white rounded-lg border p-4">
                     <a href="{{ route('events.show',$e) }}" class="block hover:bg-gray-50 rounded">
-                        <div class="font-semibold text-lg">{{ $e->title }}</div>
-                        <div class="text-sm text-gray-500 mt-1">
-                            {{ $e->starts_at->toDayDateTimeString() }}
-                            @if($e->location) • {{ $e->location }} @endif
+                        <div class="flex items-start gap-4">
+                            @if($e->image_path)
+                                <img class="h-20 w-20 rounded border object-cover" src="{{ asset('storage/'.$e->image_path) }}" alt="{{ $e->title }} image">
+                            @endif
+
+                            <div>
+                                <div class="font-semibold text-lg">{{ $e->title }}</div>
+                                <div class="text-sm text-gray-500 mt-1">
+                                    {{ $e->starts_at->toDayDateTimeString() }}
+                                    @if($e->location) • {{ $e->location }} @endif
+                                </div>
+                                <div class="text-xs text-gray-500 mt-2">Hosted by {{ $e->user?->name ?? 'User' }}</div>
+                            </div>
                         </div>
-                        <div class="text-xs text-gray-500 mt-2">Hosted by {{ $e->user?->name ?? 'User' }}</div>
                     </a>
 
                     @auth
