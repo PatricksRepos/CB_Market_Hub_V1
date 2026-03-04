@@ -12,6 +12,7 @@
                     <a href="{{ route('events.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Events</a>
                     <a href="{{ route('suggestions.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Suggestions</a>
                     <a href="{{ route('chat.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Chat</a>
+                    <a href="{{ route('react.feed-page') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('react.feed-page') ? 'bg-indigo-700 text-white' : 'text-indigo-700 hover:bg-indigo-50' }}">React Feed</a>
                     @auth
                         @if(auth()->user()->isAdmin())
                             <a href="{{ route('moderation.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('moderation.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Moderation</a>
@@ -64,6 +65,7 @@
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('chat.index') }}">Chat</a>
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('listings.index') }}">Marketplace</a>
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('events.index') }}">Events</a>
+            <a class="block px-3 py-2 rounded-lg hover:bg-indigo-50 text-indigo-700" href="{{ route('react.feed-page') }}">React Feed</a>
             @auth
                 @if(auth()->user()->isAdmin())
                     <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('moderation.index') }}">Moderation</a>
