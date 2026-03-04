@@ -21,7 +21,7 @@
 
                 <form method="POST" action="{{ route('events.update', $event) }}" enctype="multipart/form-data" class="space-y-4">
                     @csrf
-                    @method('PUT')
+                    @method('PATCH')
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Title</label>
