@@ -11,7 +11,12 @@ class ListingController extends Controller
 {
     public function index(Request $request)
     {
-        $category = $request->query('category', 'buy_sell');
+        $allowedCategories = ['buy_sell', 'all', 'general', 'buy', 'sell', 'trade', 'services'];
+        $category = (string) $request->query('category', 'buy_sell');
+
+        if (!in_array($category, $allowedCategories, true)) {
+            $category = 'buy_sell';
+        }
 
         $q = Listing::query()->where('is_active', true)->with('user')->latest();
         if ($category === 'buy_sell') {
@@ -22,14 +27,19 @@ class ListingController extends Controller
 
         $postQuery = Post::query()
             ->where('is_hidden', false)
-            ->whereNotNull('marketplace_action')
+            ->where('type', 'marketplace')
             ->with(['user', 'images'])
             ->latest();
 
         if ($category === 'buy_sell') {
-            $postQuery->whereIn('marketplace_action', ['buy', 'sell']);
+            $postQuery->where(function ($query) {
+                $query->whereIn('marketplace_action', ['buy', 'sell'])
+                    ->orWhereNull('marketplace_action');
+            });
         } elseif (in_array($category, ['buy', 'sell', 'trade'], true)) {
             $postQuery->where('marketplace_action', $category);
+        } elseif (in_array($category, ['general', 'services'], true)) {
+            $postQuery->whereNull('marketplace_action');
         }
 
         $listings = $q->paginate(20)->withQueryString();
