@@ -92,3 +92,22 @@ php artisan test --filter=MarketplacePostFeedVisibilityTest
 
 - Some default Laravel files/components remain from the starter scaffold.
 - Public file uploads are expected on the `public` disk (`storage:link` as needed).
+
+
+## Frontend Migration Recommendation (without disrupting Blade routes)
+
+For this codebase, the best path is **React or Vue**, not Angular.
+
+- **Recommended:** React (if your team preference is React).
+- **Also good:** Vue (Laravel has excellent first-party Vue momentum).
+- **Not recommended here:** Angular, because it introduces more framework overhead than needed for this Laravel app.
+
+### Safe coexistence plan
+
+1. Keep all current Blade routes unchanged (`/posts`, `/marketplace`, `/events`, etc.).
+2. Mount the new JS UI under an isolated prefix (example in this repo: `/labs/react`).
+3. Build shared JSON endpoints/controllers and have both Blade and React consume the same backend logic.
+4. Migrate one screen at a time (start with low-risk pages) behind explicit routes.
+5. Only cut over existing Blade routes after parity is complete.
+
+This gives you zero-risk incremental migration: old pages keep working while new UI ships in parallel.

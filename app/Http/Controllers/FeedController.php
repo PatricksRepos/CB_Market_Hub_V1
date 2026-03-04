@@ -93,6 +93,18 @@ class FeedController extends Controller
         ]);
     }
 
+
+    public function reactSummary()
+    {
+        return response()->json([
+            'posts' => Post::query()->count(),
+            'polls' => Poll::query()->count(),
+            'events' => Event::query()->where('is_public', true)->count(),
+            'suggestions' => Suggestion::query()->count(),
+            'listings' => Listing::query()->where('is_active', true)->count(),
+        ]);
+    }
+
     private function matchesSearch(array $item, string $search): bool
     {
         $needle = Str::lower($search);
