@@ -16,7 +16,28 @@
 
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-3">
-            @foreach ($items as $item)
+            <div class="bg-white shadow-sm rounded-lg p-4">
+                <form method="GET" action="{{ route('feed.index') }}" class="grid gap-3 sm:grid-cols-12 sm:items-end">
+                    <div class="sm:col-span-6">
+                        <label for="q" class="block text-xs uppercase tracking-wide text-gray-500">Search</label>
+                        <input id="q" type="text" name="q" value="{{ $search }}" placeholder="Search posts, events, listings..." class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    <div class="sm:col-span-4">
+                        <label for="type" class="block text-xs uppercase tracking-wide text-gray-500">Type</label>
+                        <select id="type" name="type" class="mt-1 w-full rounded border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                            @foreach($availableTypes as $typeValue => $typeLabel)
+                                <option value="{{ $typeValue }}" @selected($selectedType === $typeValue)>{{ $typeLabel }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2 flex gap-2">
+                        <button type="submit" class="inline-flex items-center rounded border px-3 py-2 text-sm hover:bg-gray-50">Apply</button>
+                        <a href="{{ route('feed.index') }}" class="inline-flex items-center rounded border px-3 py-2 text-sm hover:bg-gray-50">Reset</a>
+                    </div>
+                </form>
+            </div>
+
+            @forelse ($items as $item)
                 <div class="bg-white shadow-sm rounded-lg p-4">
                     @if ($item['type']==='post')
                         <div class="text-xs text-gray-500">New post • {{ $item['at']->diffForHumans() }}</div>
@@ -91,7 +112,9 @@
                         <x-reaction-bar :model="$item['data']" type="poll_comment" />
                     @endif
                 </div>
-            @endforeach
+            @empty
+                <div class="bg-white shadow-sm rounded-lg p-4 text-gray-600">No activity matched your filters.</div>
+            @endforelse
         </div>
     </div>
 </x-app-layout>
