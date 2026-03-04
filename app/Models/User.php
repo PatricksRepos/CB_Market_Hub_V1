@@ -16,6 +16,8 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar_url',
+        'username',
+        'bio',
         'is_admin',
     ];
 
@@ -37,6 +39,7 @@ class User extends Authenticatable
 
     // Existing app relationships (safe if the models exist)
     public function posts() { return $this->hasMany(\App\Models\Post::class); }
+    public function polls() { return $this->hasMany(\App\Models\Poll::class); }
     public function reports() { return $this->hasMany(\App\Models\Report::class); }
     public function listings() { return $this->hasMany(\App\Models\Listing::class); }
     public function events() { return $this->hasMany(\App\Models\Event::class); }

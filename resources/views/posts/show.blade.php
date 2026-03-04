@@ -3,7 +3,9 @@
 
   <div class="p-6 space-y-4">
     <div class="text-sm opacity-70">
-      @if($post->category) {{ $post->category->name }} • @endif
+      @if($post->category)
+      {{ $post->category->parent ? $post->category->parent->name.' › '.$post->category->name : $post->category->name }} •
+    @endif
       Posted by:
       @if($post->is_anonymous) {{ $post->anonymous_name ?? 'Anon' }}
       @else {{ $post->user->name }}

@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between gap-3">
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">Polls</h2>
-                <div class="text-sm text-gray-500">Browse active polls, ended polls, and vote.</div>
+                <div class="text-sm text-gray-500">Discussion Hub: start conversations and get quick community feedback.</div>
             </div>
             @auth
                 <a class="rounded-lg bg-gray-900 px-4 py-2.5 text-white font-semibold hover:bg-gray-800"

@@ -21,11 +21,6 @@ Route::get('/', [FeedController::class, 'index'])->name('feed.index');
 Route::middleware(['auth','verified'])->get('/dashboard', function () {
     return redirect()->route('feed.index');
 })->name('dashboard');
-Route::get('/events', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
-Route::get('/events/create', [\App\Http\Controllers\EventController::class, 'create'])->name('events.create');
-Route::post('/events', [\App\Http\Controllers\EventController::class, 'store'])->name('events.store');
-Route::get('/events/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
-
 /*
 |--------------------------------------------------------------------------
 | Profiles
@@ -34,7 +29,8 @@ Route::get('/events/{event}', [\App\Http\Controllers\EventController::class, 'sh
 Route::get('/u/{user}', [ProfileController::class, 'show'])->name('profiles.show');
 Route::middleware(['auth','verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profiles.edit');
-    Route::post('/profile', [ProfileController::class, 'update'])->name('profiles.update');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profiles.update');
+    Route::post('/profile', [ProfileController::class, 'update']);
 });
 
 /*
@@ -54,10 +50,10 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+Route::get('/posts/create', [PostController::class, 'create'])->middleware(['auth'])->name('posts.create');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
-Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+Route::middleware(['auth'])->group(function () {
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
 
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
@@ -76,10 +72,10 @@ Route::middleware(['auth','verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/polls', [PollController::class, 'index'])->name('polls.index');
+Route::get('/polls/create', [PollController::class, 'create'])->middleware(['auth'])->name('polls.create');
 Route::get('/polls/{poll}', [PollController::class, 'show'])->name('polls.show');
 
-Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/polls/create', [PollController::class, 'create'])->name('polls.create');
+Route::middleware(['auth'])->group(function () {
     Route::post('/polls', [PollController::class, 'store'])->middleware('throttle:5,60')->name('polls.store');
 
     Route::post('/polls/{poll}/vote', [PollController::class, 'vote'])->name('polls.vote');
@@ -97,11 +93,14 @@ Route::middleware(['auth','verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/marketplace', [ListingController::class, 'index'])->name('listings.index');
+Route::get('/marketplace/create', [ListingController::class, 'create'])->middleware(['auth'])->name('listings.create');
 Route::get('/marketplace/{listing}', [ListingController::class, 'show'])->name('listings.show');
 
-Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/marketplace/create', [ListingController::class, 'create'])->name('listings.create');
+Route::middleware(['auth'])->group(function () {
     Route::post('/marketplace', [ListingController::class, 'store'])->name('listings.store');
+    Route::get('/marketplace/{listing}/edit', [ListingController::class, 'edit'])->name('listings.edit');
+    Route::put('/marketplace/{listing}', [ListingController::class, 'update'])->name('listings.update');
+    Route::delete('/marketplace/{listing}', [ListingController::class, 'destroy'])->name('listings.destroy');
 });
 
 /*
@@ -110,11 +109,14 @@ Route::middleware(['auth','verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
+Route::get('/events/create', [EventController::class, 'create'])->middleware(['auth'])->name('events.create');
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 
-Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
+Route::middleware(['auth'])->group(function () {
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
+    Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
+    Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
     Route::post('/events/{event}/rsvp', [EventController::class, 'rsvp'])->name('events.rsvp');
 });
 /*
@@ -124,11 +126,16 @@ Route::middleware(['auth','verified'])->group(function () {
 */
 
 Route::get('/suggestions', [\App\Http\Controllers\SuggestionController::class, 'index'])->name('suggestions.index');
-Route::get('/suggestions/create', [\App\Http\Controllers\SuggestionController::class, 'create'])->middleware(['auth','verified'])->name('suggestions.create');
-Route::post('/suggestions', [\App\Http\Controllers\SuggestionController::class, 'store'])->middleware(['auth','verified'])->name('suggestions.store');
+Route::get('/suggestions/create', [\App\Http\Controllers\SuggestionController::class, 'create'])->middleware(['auth'])->name('suggestions.create');
+Route::post('/suggestions', [\App\Http\Controllers\SuggestionController::class, 'store'])->middleware(['auth'])->name('suggestions.store');
 Route::get('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'show'])->name('suggestions.show');
-Route::post('/suggestions/{suggestion}/vote', [\App\Http\Controllers\SuggestionController::class, 'vote'])->middleware(['auth','verified'])->name('suggestions.vote');
-Route::delete('/suggestions/{suggestion}/vote', [\App\Http\Controllers\SuggestionController::class, 'unvote'])->middleware(['auth','verified'])->name('suggestions.unvote');
+Route::post('/suggestions/{suggestion}/vote', [\App\Http\Controllers\SuggestionController::class, 'vote'])->middleware(['auth'])->name('suggestions.vote');
+Route::delete('/suggestions/{suggestion}/vote', [\App\Http\Controllers\SuggestionController::class, 'unvote'])->middleware(['auth'])->name('suggestions.unvote');
+Route::post('/suggestions/{suggestion}/report', [\App\Http\Controllers\SuggestionController::class, 'report'])->middleware(['auth'])->name('suggestions.report');
+Route::patch('/suggestions/{suggestion}/status', [\App\Http\Controllers\SuggestionController::class, 'setStatus'])->middleware(['auth'])->name('suggestions.status');
+Route::get('/suggestions/{suggestion}/edit', [\App\Http\Controllers\SuggestionController::class, 'edit'])->middleware(['auth'])->name('suggestions.edit');
+Route::put('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'update'])->middleware(['auth'])->name('suggestions.update');
+Route::delete('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'destroy'])->middleware(['auth'])->name('suggestions.destroy');
 
 
 /*
@@ -139,6 +146,6 @@ Route::delete('/suggestions/{suggestion}/vote', [\App\Http\Controllers\Suggestio
 
 Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
 Route::get('/chat/fetch', [\App\Http\Controllers\ChatController::class, 'fetch'])->name('chat.fetch');
-Route::post('/chat', [\App\Http\Controllers\ChatController::class, 'send'])->middleware(['auth','verified'])->name('chat.send');
-Route::delete('/chat/{message}', [\App\Http\Controllers\ChatController::class, 'delete'])->middleware(['auth','verified'])->name('chat.delete');
+Route::post('/chat', [\App\Http\Controllers\ChatController::class, 'send'])->middleware(['auth'])->name('chat.send');
+Route::delete('/chat/{message}', [\App\Http\Controllers\ChatController::class, 'delete'])->middleware(['auth'])->name('chat.delete');
 require __DIR__.'/auth.php';

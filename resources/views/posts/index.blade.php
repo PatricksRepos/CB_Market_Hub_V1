@@ -11,20 +11,25 @@
         <a class="underline" href="{{ route('login') }}">Login to Post</a>
       @endauth
 
+      <a class="underline" href="{{ route('polls.index') }}">Discussions (Polls)</a>
       <a class="underline" href="/admin">Admin</a>
     </div>
 
-    <form method="GET" class="flex gap-2 items-center">
+    <form method="GET" class="flex flex-wrap gap-2 items-center">
+      <input name="q" value="{{ request('q') }}" placeholder="Search posts" class="border rounded px-3 py-1">
       <select name="category" class="border rounded">
         <option value="">All Categories</option>
         @foreach($categories as $cat)
           <option value="{{ $cat->id }}" @selected(request('category') == $cat->id)>{{ $cat->name }}</option>
+          @foreach($cat->children as $child)
+            <option value="{{ $child->id }}" @selected(request('category') == $child->id)>— {{ $child->name }}</option>
+          @endforeach
         @endforeach
       </select>
 
       <button class="px-3 py-1 border rounded">Filter</button>
 
-      @if(request('category'))
+      @if(request('category') || request('q'))
         <a class="underline" href="{{ route('posts.index') }}">Clear</a>
       @endif
     </form>
@@ -34,7 +39,9 @@
         <div class="p-4 border rounded">
           <div class="text-sm opacity-70">
             {{ $post->type }}
-            @if($post->category) • {{ $post->category->name }} @endif
+            @if($post->category)
+              • {{ $post->category->parent ? $post->category->parent->name.' › '.$post->category->name : $post->category->name }}
+            @endif
             @if($post->is_promoted) • PROMOTED @endif
           </div>
 

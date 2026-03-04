@@ -50,6 +50,15 @@
                             <button class="rounded-lg border px-4 py-2 hover:bg-gray-50" type="submit">Report</button>
                         </form>
 
+                        @if(auth()->id() === $suggestion->user_id || auth()->user()->isAdmin())
+                            <a href="{{ route('suggestions.edit', $suggestion) }}" class="rounded-lg border px-4 py-2 hover:bg-gray-50">Edit</a>
+                            <form method="POST" action="{{ route('suggestions.destroy', $suggestion) }}" onsubmit="return confirm('Delete this suggestion?');">
+                                @csrf
+                                @method('DELETE')
+                                <button class="rounded-lg bg-red-600 text-white px-4 py-2 hover:bg-red-700" type="submit">Delete</button>
+                            </form>
+                        @endif
+
                         @if(auth()->user()->isAdmin())
                             <form method="POST" action="{{ route('suggestions.status',$suggestion) }}" class="flex gap-2">
                                 @csrf
