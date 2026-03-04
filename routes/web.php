@@ -20,19 +20,6 @@ use App\Http\Controllers\ModerationController;
 
 Route::get('/', [FeedController::class, 'index'])->name('feed.index');
 
-Route::redirect('/react', '/');
-Route::redirect('/feed-react', '/');
-Route::redirect('/react-app', '/');
-
-Route::prefix('labs')->group(function () {
-    Route::redirect('/react', '/')->name('react.index');
-    Route::redirect('/feed-react', '/')->name('react.feed-page');
-    Route::redirect('/app-react', '/')->name('react.app');
-    Route::get('/react/summary', [FeedController::class, 'reactSummary'])->name('react.summary');
-    Route::get('/react/feed', [FeedController::class, 'reactFeed'])->name('react.feed');
-    Route::get('/react/site-overview', [FeedController::class, 'reactSiteOverview'])->name('react.site-overview');
-});
-
 Route::middleware(['auth','verified'])->get('/dashboard', function () {
     return redirect()->route('feed.index');
 })->name('dashboard');

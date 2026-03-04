@@ -93,21 +93,21 @@ php artisan test --filter=MarketplacePostFeedVisibilityTest
 - Some default Laravel files/components remain from the starter scaffold.
 - Public file uploads are expected on the `public` disk (`storage:link` as needed).
 
+## Blade-First Optimization Roadmap
 
-## Frontend Migration Recommendation (without disrupting Blade routes)
+The current app is optimized around Laravel + Blade, and that is the recommended direction for stability and speed of delivery.
 
-For this codebase, the best path is **React or Vue**, not Angular.
+### Backend performance priorities
 
-- **Recommended:** React (if your team preference is React).
-- **Also good:** Vue (Laravel has excellent first-party Vue momentum).
-- **Not recommended here:** Angular, because it introduces more framework overhead than needed for this Laravel app.
+1. Add short-lived cache layers for high-traffic feed queries.
+2. Keep eager-loading on feed/content pages to avoid N+1 queries.
+3. Add/verify indexes for fields frequently filtered or sorted (`created_at`, visibility/status columns).
+4. Add targeted feature tests for hot paths (feed filtering, notifications, moderation actions).
 
-### Safe coexistence plan
+### Blade UI priorities
 
-1. Keep all current Blade routes unchanged (`/posts`, `/marketplace`, `/events`, etc.).
-2. Mount the new JS UI under an isolated prefix (example in this repo: `/labs/react`).
-3. Build shared JSON endpoints/controllers and have both Blade and React consume the same backend logic.
-4. Migrate one screen at a time (start with low-risk pages) behind explicit routes.
-5. Only cut over existing Blade routes after parity is complete.
+1. Continue using reusable Blade components for repeated UI blocks (cards, metadata rows, action bars).
+2. Use Alpine.js only for light progressive enhancement where needed.
+3. Keep all primary routes server-rendered for reliability and SEO.
+4. Iterate in small, testable visual improvements to forms, feed filters, and empty states.
 
-This gives you zero-risk incremental migration: old pages keep working while new UI ships in parallel.
