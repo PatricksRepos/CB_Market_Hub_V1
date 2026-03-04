@@ -16,13 +16,11 @@ class ReactSiteOverviewTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_react_app_page_is_available(): void
+    public function test_react_app_page_redirects_to_classic_feed(): void
     {
         $response = $this->get(route('react.app'));
 
-        $response->assertOk();
-        $response->assertSee('React implementation across the site');
-        $response->assertSee('react-site-app');
+        $response->assertRedirect('/');
     }
 
     public function test_site_overview_endpoint_returns_counts_and_sections(): void

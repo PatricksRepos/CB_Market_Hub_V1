@@ -6,12 +6,10 @@ use Tests\TestCase;
 
 class ReactFeedPageTest extends TestCase
 {
-    public function test_react_feed_page_is_available(): void
+    public function test_react_feed_page_redirects_to_classic_feed(): void
     {
         $response = $this->get(route('react.feed-page'));
 
-        $response->assertOk();
-        $response->assertSee('Community Feed in React');
-        $response->assertSee('react-feed-app');
+        $response->assertRedirect('/');
     }
 }
