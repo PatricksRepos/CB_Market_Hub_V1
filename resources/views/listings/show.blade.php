@@ -44,6 +44,15 @@
 
                 <x-reaction-bar :model="$listing" type="listing" />
 
+                @if($listing->user)
+                    <a
+                        href="{{ route('chat.index', ['message' => 'Hi '.$listing->user->name.', I\'m interested in your listing: '.$listing->title]) }}"
+                        class="mt-4 inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50"
+                    >
+                        Contact {{ $listing->user->name }}
+                    </a>
+                @endif
+
                 @auth
                     @if(auth()->id() === $listing->user_id || auth()->user()->isAdmin())
                         <div class="mt-5 flex items-center gap-2">

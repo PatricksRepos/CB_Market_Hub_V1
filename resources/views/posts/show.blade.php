@@ -27,6 +27,15 @@
 
     <x-reaction-bar :model="$post" type="post" />
 
+    @if($post->marketplace_action && !$post->is_anonymous && $post->user)
+      <a
+        href="{{ route('chat.index', ['message' => 'Hi '.$post->user->name.', I\'m interested in your post: '.$post->title]) }}"
+        class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50"
+      >
+        Contact {{ $post->user->name }}
+      </a>
+    @endif
+
     @if($post->images->count())
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
         @foreach($post->images as $img)

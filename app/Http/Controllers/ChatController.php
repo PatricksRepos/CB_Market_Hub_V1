@@ -8,7 +8,7 @@ use App\Models\ChatReport;
 
 class ChatController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $messages = ChatMessage::with('user')
             ->latest()
@@ -17,7 +17,9 @@ class ChatController extends Controller
             ->reverse()
             ->values();
 
-        return view('chat.index', compact('messages'));
+        $prefillMessage = trim((string) $request->query('message', ''));
+
+        return view('chat.index', compact('messages', 'prefillMessage'));
     }
 
     public function fetch(Request $request)

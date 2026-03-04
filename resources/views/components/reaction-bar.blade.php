@@ -4,7 +4,7 @@
 ])
 
 @php
-    $allowedEmojis = ['👍', '❤️', '😂', '😮', '🎉'];
+    $allowedEmojis = \App\Models\Reaction::ALLOWED_EMOJIS;
     $reactionsEnabled = \App\Support\Reactions::isEnabled();
     $reactions = $reactionsEnabled
         ? ($model->relationLoaded('reactions') ? $model->reactions : $model->reactions()->get(['id', 'user_id', 'emoji']))
