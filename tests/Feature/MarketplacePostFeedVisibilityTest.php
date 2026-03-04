@@ -70,4 +70,72 @@ class MarketplacePostFeedVisibilityTest extends TestCase
         $response->assertSeeText('General CB item');
         $response->assertDontSeeText('For Sale Radio');
     }
+
+    public function test_marketplace_feed_excludes_non_marketplace_post_types(): void
+    {
+        $user = User::factory()->create();
+        $category = Category::query()->create([
+            'name' => 'Buy & Sell',
+            'slug' => Str::slug('Buy & Sell'),
+            'is_active' => true,
+        ]);
+
+        Post::query()->create([
+            'user_id' => $user->id,
+            'category_id' => $category->id,
+            'type' => 'business',
+            'title' => 'Antenna Tuning Service',
+            'body' => 'Professional tune up.',
+            'marketplace_action' => null,
+        ]);
+
+        $response = $this->get(route('listings.index'));
+
+        $response->assertOk();
+        $response->assertDontSeeText('Antenna Tuning Service');
+    }
+
+    public function test_invalid_marketplace_category_falls_back_to_default_filter(): void
+    {
+        $user = User::factory()->create();
+        $category = Category::query()->create([
+            'name' => 'Buy & Sell',
+            'slug' => Str::slug('Buy & Sell'),
+            'is_active' => true,
+        ]);
+
+        Post::query()->create([
+            'user_id' => $user->id,
+            'category_id' => $category->id,
+            'type' => 'marketplace',
+            'title' => 'Buying SWR Meter',
+            'body' => 'Need one in working order.',
+            'marketplace_action' => 'buy',
+        ]);
+
+        Post::query()->create([
+            'user_id' => $user->id,
+            'category_id' => $category->id,
+            'type' => 'marketplace',
+            'title' => 'General Coax Cable',
+            'body' => 'Unused length of coax cable.',
+            'marketplace_action' => null,
+        ]);
+
+        Post::query()->create([
+            'user_id' => $user->id,
+            'category_id' => $category->id,
+            'type' => 'marketplace',
+            'title' => 'Trade Mic for Mount',
+            'body' => 'Looking to trade.',
+            'marketplace_action' => 'trade',
+        ]);
+
+        $response = $this->get(route('listings.index', ['category' => 'invalid-value']));
+
+        $response->assertOk();
+        $response->assertSeeText('Buying SWR Meter');
+        $response->assertSeeText('General Coax Cable');
+        $response->assertDontSeeText('Trade Mic for Mount');
+    }
 }

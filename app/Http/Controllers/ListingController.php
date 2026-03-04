@@ -11,7 +11,12 @@ class ListingController extends Controller
 {
     public function index(Request $request)
     {
-        $category = $request->query('category', 'buy_sell');
+        $allowedCategories = ['buy_sell', 'all', 'general', 'buy', 'sell', 'trade', 'services'];
+        $category = (string) $request->query('category', 'buy_sell');
+
+        if (!in_array($category, $allowedCategories, true)) {
+            $category = 'buy_sell';
+        }
 
         $q = Listing::query()->where('is_active', true)->with('user')->latest();
         if ($category === 'buy_sell') {
