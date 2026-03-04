@@ -2,9 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between gap-3">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Suggestions</h2>
-            @auth
-                <a class="rounded-lg bg-gray-900 text-white px-4 py-2.5 font-semibold hover:bg-gray-800" href="{{ route('suggestions.create') }}">New suggestion</a>
-            @endauth
+            <a class="rounded-lg bg-gray-900 text-white px-4 py-2.5 font-semibold hover:bg-gray-800" href="{{ route('suggestions.create') }}">New suggestion</a>
         </div>
     </x-slot>
 
