@@ -94,6 +94,90 @@ class FeedController extends Controller
     }
 
 
+    public function reactFeed()
+    {
+        $posts = Post::query()
+            ->with('user:id,name')
+            ->latest()
+            ->take(8)
+            ->get()
+            ->map(fn (Post $post) => [
+                'type' => 'post',
+                'title' => (string) $post->title,
+                'excerpt' => Str::limit((string) $post->body, 120),
+                'author' => (string) optional($post->user)->name,
+                'created_at' => optional($post->created_at)->toIso8601String(),
+            ]);
+
+        $polls = Poll::query()
+            ->with('user:id,name')
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(fn (Poll $poll) => [
+                'type' => 'poll',
+                'title' => (string) $poll->question,
+                'excerpt' => 'Community poll',
+                'author' => (string) optional($poll->user)->name,
+                'created_at' => optional($poll->created_at)->toIso8601String(),
+            ]);
+
+        $events = Event::query()
+            ->where('is_public', true)
+            ->with('user:id,name')
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(fn (Event $event) => [
+                'type' => 'event',
+                'title' => (string) $event->title,
+                'excerpt' => Str::limit((string) $event->description, 120),
+                'author' => (string) optional($event->user)->name,
+                'created_at' => optional($event->created_at)->toIso8601String(),
+            ]);
+
+        $suggestions = Suggestion::query()
+            ->with('user:id,name')
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(fn (Suggestion $suggestion) => [
+                'type' => 'suggestion',
+                'title' => (string) $suggestion->title,
+                'excerpt' => Str::limit((string) $suggestion->body, 120),
+                'author' => (string) optional($suggestion->user)->name,
+                'created_at' => optional($suggestion->created_at)->toIso8601String(),
+            ]);
+
+        $listings = Listing::query()
+            ->where('is_active', true)
+            ->with('user:id,name')
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(fn (Listing $listing) => [
+                'type' => 'listing',
+                'title' => (string) $listing->title,
+                'excerpt' => Str::limit((string) $listing->body, 120),
+                'author' => (string) optional($listing->user)->name,
+                'created_at' => optional($listing->created_at)->toIso8601String(),
+            ]);
+
+        $items = collect()
+            ->concat($posts)
+            ->concat($polls)
+            ->concat($events)
+            ->concat($suggestions)
+            ->concat($listings)
+            ->sortByDesc('created_at')
+            ->take(20)
+            ->values();
+
+        return response()->json([
+            'items' => $items,
+        ]);
+    }
+
     public function reactSummary()
     {
         return response()->json([
