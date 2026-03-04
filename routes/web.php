@@ -16,6 +16,7 @@ use App\Http\Controllers\PollCommentController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ReactionController;
+use App\Http\Controllers\ModerationController;
 
 Route::get('/', [FeedController::class, 'index'])->name('feed.index');
 
@@ -42,6 +43,7 @@ Route::middleware(['auth','verified'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markOneRead'])->name('notifications.read-one');
     Route::post('/chat/{message}/report', [\App\Http\Controllers\ChatController::class, 'report'])->name('chat.report');
 });
 
@@ -140,6 +142,17 @@ Route::get('/suggestions/{suggestion}/edit', [\App\Http\Controllers\SuggestionCo
 Route::put('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'update'])->middleware(['auth'])->name('suggestions.update');
 Route::delete('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'destroy'])->middleware(['auth'])->name('suggestions.destroy');
 
+
+/*
+|--------------------------------------------------------------------------
+| Moderation
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/moderation', [ModerationController::class, 'index'])->name('moderation.index');
+    Route::patch('/moderation/reports/{report}', [ModerationController::class, 'updateStatus'])->name('moderation.reports.update');
+});
 
 /*
 |--------------------------------------------------------------------------
