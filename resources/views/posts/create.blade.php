@@ -109,7 +109,9 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Images</label>
-                        <input type="file" name="images[]" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-600">
+                        <input id="post_images" type="file" name="images[]" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-600">
+                        <div class="mt-2 text-xs text-gray-500">Upload images directly here (no image URL needed).</div>
+                        <div id="post_image_preview" class="mt-3 flex flex-wrap gap-2"></div>
                     </div>
 
                     <div class="pt-2 flex items-center gap-2">
@@ -120,6 +122,27 @@
             </div>
         </div>
     </div>
+
+    <script>
+        (function () {
+            const imageInput = document.getElementById('post_images');
+            const preview = document.getElementById('post_image_preview');
+
+            if (imageInput && preview) {
+                imageInput.addEventListener('change', () => {
+                    preview.innerHTML = '';
+                    Array.from(imageInput.files || []).slice(0, 6).forEach(file => {
+                        if (!file.type.startsWith('image/')) return;
+                        const img = document.createElement('img');
+                        img.className = 'h-20 w-20 rounded border object-cover';
+                        img.alt = 'Selected image preview';
+                        img.src = URL.createObjectURL(file);
+                        preview.appendChild(img);
+                    });
+                });
+            }
+        })();
+    </script>
 
     <script>
         (function () {

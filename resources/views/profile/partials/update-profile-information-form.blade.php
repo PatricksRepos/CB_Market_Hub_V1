@@ -66,11 +66,6 @@
             <x-input-error class="mt-2" :messages="$errors->get('avatar_image')" />
         </div>
 
-        <div>
-            <x-input-label for="avatar_url" :value="__('Avatar URL')" />
-            <x-text-input id="avatar_url" name="avatar_url" type="url" class="mt-1 block w-full" :value="old('avatar_url', $user->avatar_url)" />
-            <x-input-error class="mt-2" :messages="$errors->get('avatar_url')" />
-        </div>
 
         <div>
             <x-input-label for="bio" :value="__('Bio')" />

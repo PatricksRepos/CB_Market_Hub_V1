@@ -32,7 +32,6 @@ class ProfileController extends Controller
             'email' => ['required','string','email','max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'username' => ['nullable','string','max:30','regex:/^[a-zA-Z0-9_]+$/', Rule::unique('users', 'username')->ignore($user->id)],
             'bio' => ['nullable','string','max:800'],
-            'avatar_url' => ['nullable','url','max:255'],
             'avatar_image' => ['nullable','image','max:4096'],
         ]);
 

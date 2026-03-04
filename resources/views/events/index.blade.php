@@ -2,7 +2,11 @@
     <x-slot name="header">
         <div class="flex items-center justify-between gap-3">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Events</h2>
-            <a class="rounded-lg bg-gray-900 text-white px-4 py-2.5 font-semibold hover:bg-gray-800" href="{{ route('events.create') }}">New event</a>
+            @auth
+                <a class="rounded-lg bg-gray-900 text-white px-4 py-2.5 font-semibold hover:bg-gray-800" href="{{ route('events.create') }}">New event</a>
+            @else
+                <a class="text-sm text-gray-600 underline" href="{{ route('login') }}">Log in to create event</a>
+            @endauth
         </div>
     </x-slot>
 

@@ -1,6 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Community Feed</h2>
+        <div class="flex items-center justify-between gap-3">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Community Feed</h2>
+            <div class="flex items-center gap-2 text-sm">
+                @auth
+                    <a href="{{ route('posts.create') }}" class="rounded border px-3 py-1.5 hover:bg-gray-50">Add Post</a>
+                    <a href="{{ route('events.create') }}" class="rounded border px-3 py-1.5 hover:bg-gray-50">Add Event</a>
+                    <a href="{{ route('suggestions.create') }}" class="rounded border px-3 py-1.5 hover:bg-gray-50">Add Suggestion</a>
+                @else
+                    <a href="{{ route('login') }}" class="underline text-gray-600">Log in to add post/event/suggestion</a>
+                @endauth
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-6">
