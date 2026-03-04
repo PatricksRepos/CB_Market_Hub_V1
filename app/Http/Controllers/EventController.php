@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EventUpsertRequest;
 use App\Models\Event;
 use App\Models\EventRsvp;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $events = Event::query()
             ->where('is_public', true)
@@ -19,97 +23,99 @@ class EventController extends Controller
         return view('events.index', compact('events'));
     }
 
-    public function show(Event $event, Request $request)
+    public function show(Event $event, Request $request): View
     {
-        $event->load(['user','rsvps.user']);
+        $event->load(['user', 'rsvps.user']);
 
         $my = null;
         if ($request->user()) {
-            $my = EventRsvp::where('event_id',$event->id)
-                ->where('user_id',$request->user()->id)
+            $my = EventRsvp::query()
+                ->where('event_id', $event->id)
+                ->where('user_id', $request->user()->id)
                 ->first();
         }
 
-        return view('events.show', compact('event','my'));
+        return view('events.show', compact('event', 'my'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('events.create');
     }
 
-    public function store(Request $request)
+    public function store(EventUpsertRequest $request): RedirectResponse
     {
-        $data = $this->validateData($request);
-
         $event = Event::create([
+            ...$request->safe()->except(['image', 'remove_image']),
             'user_id' => $request->user()->id,
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'location' => $data['location'] ?? null,
-            'starts_at' => $data['starts_at'],
-            'ends_at' => $data['ends_at'] ?? null,
             'is_public' => true,
+            'image_path' => $request->file('image')?->store('event-images', 'public'),
         ]);
 
-        return redirect()->route('events.show', $event)->with('status','Event created.');
+        return redirect()->route('events.show', $event)->with('status', 'Event created.');
     }
 
-    public function edit(Request $request, Event $event)
+    public function edit(Request $request, Event $event): View
     {
-        abort_unless($event->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+        $this->authorizeEventUpdate($request, $event);
 
         return view('events.edit', compact('event'));
     }
 
-    public function update(Request $request, Event $event)
+    public function update(EventUpsertRequest $request, Event $event): RedirectResponse
     {
-        abort_unless($event->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+        $this->authorizeEventUpdate($request, $event);
 
-        $data = $this->validateData($request);
+        $payload = $request->safe()->except(['image', 'remove_image']);
 
-        $event->update([
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'location' => $data['location'] ?? null,
-            'starts_at' => $data['starts_at'],
-            'ends_at' => $data['ends_at'] ?? null,
-        ]);
+        if ((bool) $request->boolean('remove_image')) {
+            $this->deleteEventImage($event);
+            $payload['image_path'] = null;
+        }
 
-        return redirect()->route('events.show', $event)->with('status','Event updated.');
+        if ($request->hasFile('image')) {
+            $this->deleteEventImage($event);
+            $payload['image_path'] = $request->file('image')->store('event-images', 'public');
+        }
+
+        $event->update($payload);
+
+        return redirect()->route('events.show', $event)->with('status', 'Event updated.');
     }
 
-    public function destroy(Request $request, Event $event)
+    public function destroy(Request $request, Event $event): RedirectResponse
     {
-        abort_unless($event->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+        $this->authorizeEventUpdate($request, $event);
 
+        $this->deleteEventImage($event);
         $event->delete();
 
         return redirect()->route('events.index')->with('status', 'Event deleted.');
     }
 
-    public function rsvp(Request $request, Event $event)
+    public function rsvp(Request $request, Event $event): RedirectResponse
     {
         $data = $request->validate([
-            'status' => ['required','in:yes,maybe,no'],
+            'status' => ['required', 'in:yes,maybe,no'],
         ]);
 
         EventRsvp::updateOrCreate(
-            ['event_id'=>$event->id, 'user_id'=>$request->user()->id],
-            ['status'=>$data['status']]
+            ['event_id' => $event->id, 'user_id' => $request->user()->id],
+            ['status' => $data['status']]
         );
 
-        return back()->with('status','RSVP saved.');
+        return back()->with('status', 'RSVP saved.');
     }
 
-    private function validateData(Request $request): array
+    private function authorizeEventUpdate(Request $request, Event $event): void
     {
-        return $request->validate([
-            'title' => ['required','string','max:160'],
-            'description' => ['nullable','string','max:6000'],
-            'location' => ['nullable','string','max:160'],
-            'starts_at' => ['required','date'],
-            'ends_at' => ['nullable','date','after_or_equal:starts_at'],
-        ]);
+        abort_unless($event->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+    }
+
+    private function deleteEventImage(Event $event): void
+    {
+        if ($event->image_path) {
+            Storage::disk('public')->delete($event->image_path);
+        }
     }
 }
