@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Poll extends Model
 {
-    protected $fillable = [
+protected $fillable = [
         'user_id',
         'question',
         'is_active',
@@ -34,5 +34,10 @@ class Poll extends Model
     public function votes()
     {
         return $this->hasMany(PollVote::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(\App\Models\PollComment::class);
     }
 }

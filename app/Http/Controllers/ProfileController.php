@@ -2,59 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): View
+    public function show(User $user)
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user->loadCount(['posts','polls','listings','events']);
+        $latestPosts = $user->posts()->latest()->take(5)->get();
+        $latestPolls = $user->polls()->latest()->take(5)->get();
+        return view('profiles.show', compact('user','latestPosts','latestPolls'));
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function edit(Request $request)
     {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return view('profiles.edit', ['user' => $request->user()]);
     }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
 
-        Auth::logout();
+        $data = $request->validate([
+            'username' => ['nullable','string','max:30','regex:/^[a-zA-Z0-9_]+$/','unique:users,username,'.$user->id],
+            'bio' => ['nullable','string','max:800'],
+            'avatar_url' => ['nullable','url','max:255'],
+        ]);
 
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        $user->update($data);
+        return redirect()->route('profiles.show', $user)->with('status','Profile updated.');
     }
 }
