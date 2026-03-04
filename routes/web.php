@@ -81,7 +81,7 @@ Route::get('/polls/create', [PollController::class, 'create'])->middleware(['aut
 Route::get('/polls/{poll}', [PollController::class, 'show'])->name('polls.show');
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/polls', [PollController::class, 'store'])->middleware('throttle:5,60')->name('polls.store');
+    Route::post('/polls', [PollController::class, 'store'])->name('polls.store');
 
     Route::post('/polls/{poll}/vote', [PollController::class, 'vote'])->name('polls.vote');
     Route::post('/polls/{poll}/end', [PollController::class, 'endEarly'])->name('polls.end');
