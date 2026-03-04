@@ -20,6 +20,10 @@ use App\Http\Controllers\ModerationController;
 
 Route::get('/', [FeedController::class, 'index'])->name('feed.index');
 
+Route::prefix('labs')->group(function () {
+    Route::view('/react', 'react.index')->name('react.index');
+});
+
 Route::middleware(['auth','verified'])->get('/dashboard', function () {
     return redirect()->route('feed.index');
 })->name('dashboard');
