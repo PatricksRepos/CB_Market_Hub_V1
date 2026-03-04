@@ -24,6 +24,29 @@
             { value: 'poll_comment', label: 'Poll comments' },
         ];
 
+        const primaryNav = [
+            { label: 'Feed', href: '/' },
+            { label: 'Posts', href: '/posts' },
+            { label: 'Polls', href: '/polls' },
+            { label: 'Marketplace', href: '/listings' },
+            { label: 'Events', href: '/events' },
+            { label: 'Suggestions', href: '/suggestions' },
+            { label: 'Chat', href: '/chat' },
+            { label: 'React Feed', href: '/labs/feed-react', active: true },
+        ];
+
+        const accountNav = [
+            { label: 'Notifications', href: '/notifications' },
+            { label: 'Profile', href: '/profile' },
+            { label: 'Log out', href: '/logout', danger: true },
+        ];
+
+        const quickActions = [
+            { label: 'Add Post', href: '/posts/create' },
+            { label: 'Add Event', href: '/events/create' },
+            { label: 'Add Suggestion', href: '/suggestions/create' },
+        ];
+
         const FeedCard = ({ item }) => React.createElement(
             'article',
             { className: 'group rounded-2xl border border-slate-800/80 bg-slate-900/90 p-5 shadow-xl shadow-slate-950/20 transition hover:-translate-y-0.5 hover:border-indigo-400/50' },
@@ -87,6 +110,33 @@
             return React.createElement(
                 'main',
                 { className: 'min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950' },
+                React.createElement('header', { className: 'sticky top-0 z-20 border-b border-slate-800/90 bg-slate-950/95 backdrop-blur' },
+                    React.createElement('div', { className: 'mx-auto max-w-6xl px-6 py-4' },
+                        React.createElement('div', { className: 'flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between' },
+                            React.createElement('div', null,
+                                React.createElement('a', { href: '/', className: 'text-lg font-bold text-white' }, 'CB Community'),
+                                React.createElement('nav', { className: 'mt-3 flex flex-wrap gap-2' },
+                                    ...primaryNav.map((item) => React.createElement('a', {
+                                        key: item.label,
+                                        href: item.href,
+                                        className: item.active
+                                            ? 'rounded-lg bg-indigo-600/90 px-3 py-1.5 text-sm font-medium text-white'
+                                            : 'rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-200 hover:border-slate-500 hover:text-white',
+                                    }, item.label))
+                                )
+                            ),
+                            React.createElement('nav', { className: 'flex flex-wrap gap-2' },
+                                ...accountNav.map((item) => React.createElement('a', {
+                                    key: item.label,
+                                    href: item.href,
+                                    className: item.danger
+                                        ? 'rounded-lg border border-rose-400/40 bg-rose-950/40 px-3 py-1.5 text-sm text-rose-200 hover:bg-rose-900/50'
+                                        : 'rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-200 hover:border-slate-500 hover:text-white',
+                                }, item.label))
+                            )
+                        )
+                    )
+                ),
                 React.createElement('div', { className: 'mx-auto max-w-6xl px-6 py-12' },
                     React.createElement('div', { className: 'mb-7 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-6 shadow-2xl shadow-black/20 backdrop-blur-sm md:p-8' },
                         React.createElement('div', { className: 'flex flex-col gap-4 md:flex-row md:items-center md:justify-between' },
@@ -101,6 +151,13 @@
                             React.createElement('span', { className: 'rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs text-slate-300' }, `Loaded: ${items.length}`),
                             React.createElement('span', { className: 'rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs text-slate-300' }, `Total matches: ${total}`),
                             React.createElement('span', { className: 'rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs text-slate-300' }, `Page: ${page}`)
+                        ),
+                        React.createElement('div', { className: 'mt-5 flex flex-wrap gap-2' },
+                            ...quickActions.map((action) => React.createElement('a', {
+                                key: action.label,
+                                href: action.href,
+                                className: 'rounded-lg bg-white/10 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-white/20',
+                            }, action.label))
                         )
                     ),
 
