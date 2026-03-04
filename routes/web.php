@@ -20,6 +20,9 @@ use App\Http\Controllers\ModerationController;
 
 Route::get('/', [FeedController::class, 'index'])->name('feed.index');
 
+Route::redirect('/react', '/labs/react');
+Route::redirect('/feed-react', '/labs/feed-react');
+
 Route::prefix('labs')->group(function () {
     Route::view('/react', 'react.index')->name('react.index');
     Route::view('/feed-react', 'react.feed')->name('react.feed-page');
