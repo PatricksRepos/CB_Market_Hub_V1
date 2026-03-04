@@ -6,6 +6,7 @@ use App\Models\Poll;
 use App\Models\PollOption;
 use App\Models\PollVote;
 use Illuminate\Http\Request;
+use App\Support\Reactions;
 
 class PollController extends Controller
 {
@@ -99,7 +100,7 @@ class PollController extends Controller
 
     public function show(Poll $poll, Request $request)
     {
-        $poll->load(['options','votes','comments.user']);
+        $poll->load(array_filter(['options','votes', Reactions::isEnabled() ? 'reactions' : null, 'comments.user', Reactions::isEnabled() ? 'comments.reactions' : null]));
 
         $user = $request->user();
         $myVote = null;

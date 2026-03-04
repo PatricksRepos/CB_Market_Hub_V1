@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Support\Reactions;
 
 class PostController extends Controller
 {
@@ -82,7 +83,7 @@ class PostController extends Controller
     {
         abort_if($post->is_hidden, 404);
 
-        $post->load(['images', 'user', 'category.parent']);
+        $post->load(array_filter(['images', 'user', 'category.parent', Reactions::isEnabled() ? 'reactions' : null]));
 
         return view('posts.show', compact('post'));
     }

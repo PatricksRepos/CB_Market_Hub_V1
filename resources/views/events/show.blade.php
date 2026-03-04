@@ -13,6 +13,10 @@
             @endif
 
             <div class="bg-white rounded-lg border p-6">
+                @if($event->image_path)
+                    <img class="mb-4 h-56 w-full rounded-lg border object-cover" src="{{ asset('storage/'.$event->image_path) }}" alt="{{ $event->title }} image">
+                @endif
+
                 <div class="text-sm text-gray-500">
                     Starts: {{ $event->starts_at->toDayDateTimeString() }}
                     @if($event->ends_at) • Ends: {{ $event->ends_at->toDayDateTimeString() }} @endif
@@ -27,6 +31,8 @@
                 @if($event->description)
                     <div class="mt-4 whitespace-pre-wrap text-gray-800">{{ $event->description }}</div>
                 @endif
+
+                <x-reaction-bar :model="$event" type="event" />
 
                 @auth
                     @if(auth()->id() === $event->user_id || auth()->user()->isAdmin())

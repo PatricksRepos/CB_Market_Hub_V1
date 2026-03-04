@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Listing;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use App\Support\Reactions;
 
 class ListingController extends Controller
 {
@@ -39,7 +40,7 @@ class ListingController extends Controller
 
     public function show(Listing $listing)
     {
-        $listing->load('user');
+        $listing->load(array_filter(['user', Reactions::isEnabled() ? 'reactions' : null]));
         return view('listings.show', compact('listing'));
     }
 

@@ -38,12 +38,15 @@
                             </a>
                         @endif
 
+                        <x-reaction-bar :model="$item['data']" type="post" />
+
                     @elseif ($item['type']==='listing')
                         <div class="text-xs text-gray-500">New marketplace listing • {{ $item['at']->diffForHumans() }}</div>
                         <div class="font-semibold text-lg mt-1">
                             <a class="hover:underline" href="{{ route('listings.show', $item['data']) }}">{{ $item['data']->title }}</a>
                         </div>
                         <div class="text-sm text-gray-600">{{ ucfirst($item['data']->category) }} • by {{ $item['data']->user?->name ?? 'User' }}</div>
+                        <x-reaction-bar :model="$item['data']" type="listing" />
 
                     @elseif ($item['type']==='event')
                         <div class="text-xs text-gray-500">New event • {{ $item['at']->diffForHumans() }}</div>
@@ -51,6 +54,7 @@
                             <a class="hover:underline" href="{{ route('events.show', $item['data']) }}">{{ $item['data']->title }}</a>
                         </div>
                         <div class="text-sm text-gray-600">Hosted by {{ $item['data']->user?->name ?? 'User' }}</div>
+                        <x-reaction-bar :model="$item['data']" type="event" />
 
                     @elseif ($item['type']==='suggestion')
                         <div class="text-xs text-gray-500">New suggestion • {{ $item['at']->diffForHumans() }}</div>
@@ -58,12 +62,14 @@
                             <a class="hover:underline" href="{{ route('suggestions.show', $item['data']) }}">{{ $item['data']->title }}</a>
                         </div>
                         <div class="text-sm text-gray-600">By {{ $item['data']->is_anonymous ? 'Anonymous' : ($item['data']->user?->name ?? 'User') }}</div>
+                        <x-reaction-bar :model="$item['data']" type="suggestion" />
 
                     @elseif ($item['type']==='poll')
                         <div class="text-xs text-gray-500">New poll • {{ $item['at']->diffForHumans() }}</div>
                         <div class="font-semibold text-lg mt-1">
                             <a class="hover:underline" href="{{ route('polls.show', $item['data']) }}">{{ $item['data']->question }}</a>
                         </div>
+                        <x-reaction-bar :model="$item['data']" type="poll" />
                     @elseif ($item['type']==='post_comment')
                         <div class="text-xs text-gray-500">Post comment • {{ $item['at']->diffForHumans() }}</div>
                         <div class="mt-1">
@@ -82,6 +88,7 @@
                         <div class="text-sm mt-2">
                             <a class="underline" href="{{ route('polls.show', $item['data']->poll_id) }}">Open poll</a>
                         </div>
+                        <x-reaction-bar :model="$item['data']" type="poll_comment" />
                     @endif
                 </div>
             @endforeach
