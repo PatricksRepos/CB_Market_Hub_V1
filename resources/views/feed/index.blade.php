@@ -12,9 +12,9 @@
                         <div class="mt-2 flex items-center gap-2 text-sm text-gray-600">
                             @php $postUser = $item['data']->user; @endphp
                             @if($postUser?->avatar_url)
-                                <img src="{{ $postUser->avatar_url }}" alt="{{ $postUser->name }} avatar" class="h-5 w-5 rounded-full object-cover border">
+                                <img src="{{ $postUser->avatar_url }}" alt="{{ $postUser->name }} avatar" class="h-16 w-16 rounded-full object-cover border">
                             @else
-                                <div class="h-5 w-5 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-[10px] font-semibold">{{ strtoupper(substr($postUser?->name ?? 'U',0,1)) }}</div>
+                                <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xl font-semibold">{{ strtoupper(substr($postUser?->name ?? 'U',0,1)) }}</div>
                             @endif
                             <span class="font-medium">{{ $item['data']->is_anonymous ? ($item['data']->anonymous_name ?? 'Anon') : ($postUser?->name ?? 'User') }}</span>
                         </div>

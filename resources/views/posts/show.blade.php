@@ -5,9 +5,9 @@
     <div class="flex items-center gap-2 text-sm opacity-70">
       @if(!$post->is_anonymous)
         @if($post->user?->avatar_url)
-          <img src="{{ $post->user->avatar_url }}" alt="{{ $post->user->name }} avatar" class="h-8 w-8 rounded-full object-cover border">
+          <img src="{{ $post->user->avatar_url }}" alt="{{ $post->user->name }} avatar" class="h-16 w-16 rounded-full object-cover border">
         @else
-          <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xs font-semibold">{{ strtoupper(substr($post->user?->name ?? 'U',0,1)) }}</div>
+          <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xs font-semibold">{{ strtoupper(substr($post->user?->name ?? 'U',0,1)) }}</div>
         @endif
       @endif
 
