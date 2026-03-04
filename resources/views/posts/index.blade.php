@@ -59,7 +59,9 @@
 
           @if($post->images->first())
             <a href="{{ route('posts.show', $post) }}" class="block mt-2">
-              <img class="h-24 w-24 rounded border object-cover" src="{{ asset('storage/'.$post->images->first()->path) }}" alt="Post image thumbnail">
+              <div class="w-full max-w-xl rounded-lg border overflow-hidden bg-gray-100" style="height: 20rem;">
+                <img class="w-full h-full object-cover" style="width: 100%; height: 100%; object-fit: cover;" src="{{ asset('storage/'.$post->images->first()->path) }}" alt="Post image thumbnail">
+              </div>
             </a>
           @endif
 
