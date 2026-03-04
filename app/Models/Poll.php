@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Poll extends Model
 {
@@ -40,4 +41,10 @@ protected $fillable = [
     {
         return $this->hasMany(\App\Models\PollComment::class);
     }
+
+    public function reactions(): MorphMany
+    {
+        return $this->morphMany(Reaction::class, 'reactable');
+    }
+
 }

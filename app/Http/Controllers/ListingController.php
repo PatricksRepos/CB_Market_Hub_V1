@@ -39,7 +39,7 @@ class ListingController extends Controller
 
     public function show(Listing $listing)
     {
-        $listing->load('user');
+        $listing->load(['user', 'reactions']);
         return view('listings.show', compact('listing'));
     }
 

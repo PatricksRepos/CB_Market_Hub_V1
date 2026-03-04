@@ -25,6 +25,8 @@
 
     <div class="border rounded p-4 whitespace-pre-wrap">{{ $post->body }}</div>
 
+    <x-reaction-bar :model="$post" type="post" />
+
     @if($post->images->count())
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
         @foreach($post->images as $img)

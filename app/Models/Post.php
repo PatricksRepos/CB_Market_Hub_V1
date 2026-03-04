@@ -30,4 +30,5 @@ class Post extends Model
     public function category(): BelongsTo { return $this->belongsTo(Category::class); }
     public function images(): HasMany { return $this->hasMany(PostImage::class)->orderBy('sort_order'); }
     public function reports(): MorphMany { return $this->morphMany(Report::class, 'reportable'); }
+    public function reactions(): MorphMany { return $this->morphMany(Reaction::class, 'reactable'); }
 }

@@ -27,7 +27,7 @@ class SuggestionController extends Controller
 
     public function show(Suggestion $suggestion, Request $request)
     {
-        $suggestion->load('user')->loadCount('votes');
+        $suggestion->load(['user', 'reactions'])->loadCount('votes');
 
         $hasVoted = false;
         if ($request->user()) {
