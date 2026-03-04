@@ -37,7 +37,7 @@
         });
 
         const DataCard = ({ title, value, hint }) => React.createElement('div', {
-            className: 'rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-3',
+            className: 'rounded-xl border border-indigo-400/20 bg-slate-900/75 px-4 py-3 shadow-lg shadow-indigo-950/20',
         },
             React.createElement('p', { className: 'text-xs uppercase tracking-wide text-slate-400' }, title),
             React.createElement('p', { className: 'mt-1 text-2xl font-semibold text-white' }, String(value ?? 0)),
@@ -46,7 +46,7 @@
 
         const ListCard = ({ item }) => React.createElement('a', {
             href: item.href || '#',
-            className: 'block rounded-xl border border-slate-800 bg-slate-900/80 p-4 transition hover:-translate-y-0.5 hover:border-indigo-400/60',
+            className: 'block rounded-xl border border-slate-700/80 bg-slate-900/85 p-4 transition hover:-translate-y-0.5 hover:border-indigo-400/60 hover:shadow-lg hover:shadow-indigo-950/30',
         },
             React.createElement('p', { className: 'text-sm font-semibold text-white' }, item.title || 'Untitled'),
             React.createElement('p', { className: 'mt-1 text-sm text-slate-300' }, item.excerpt || 'No preview available'),
@@ -94,7 +94,7 @@
 
             const sectionItems = useMemo(() => overview.sections?.[activeSection] || [], [overview, activeSection]);
 
-            return React.createElement('main', { className: 'min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950' },
+            return React.createElement('main', { className: 'min-h-screen bg-[radial-gradient(circle_at_top,_#1d4ed8_0%,_#0f172a_38%,_#020617_100%)]' },
                 React.createElement('header', { className: 'sticky top-0 z-20 border-b border-slate-800/90 bg-slate-950/95 backdrop-blur' },
                     React.createElement('div', { className: 'mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-4' },
                         React.createElement('a', { href: '/', className: 'text-lg font-bold text-white' }, 'CB Community'),
@@ -103,25 +103,26 @@
                                 key,
                                 href: item.href,
                                 className: key === 'feed'
-                                    ? 'rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white'
-                                    : 'rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-200 hover:border-slate-500 hover:text-white',
+                                    ? 'rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-3 py-1.5 text-sm font-medium text-white'
+                                    : 'rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-200 hover:border-indigo-400/50 hover:text-white',
                             }, item.label)),
-                            React.createElement('a', { href: '/labs/app-react', className: 'rounded-lg border border-indigo-400/50 bg-indigo-500/20 px-3 py-1.5 text-sm font-medium text-indigo-200' }, 'React App')
+                            React.createElement('a', { href: '/labs/app-react', className: 'rounded-lg border border-violet-400/60 bg-violet-500/20 px-3 py-1.5 text-sm font-medium text-violet-100' }, 'React App')
                         )
                     )
                 ),
 
                 React.createElement('div', { className: 'mx-auto grid max-w-7xl gap-6 px-6 py-8 lg:grid-cols-12' },
-                    React.createElement('section', { className: 'rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-2xl lg:col-span-8' },
+                    React.createElement('section', { className: 'rounded-3xl border border-indigo-400/20 bg-slate-900/75 p-6 shadow-2xl shadow-indigo-950/30 lg:col-span-8' },
                         React.createElement('div', { className: 'flex flex-wrap items-start justify-between gap-3' },
                             React.createElement('div', null,
-                                React.createElement('h1', { className: 'text-3xl font-bold text-white' }, 'React app shell (full-site preview)'),
+                                React.createElement('p', { className: 'text-xs font-semibold uppercase tracking-[0.18em] text-indigo-300' }, 'React App Surface'),
+                                React.createElement('h1', { className: 'mt-2 text-3xl font-bold text-white' }, 'React app shell (full-site preview)'),
                                 React.createElement('p', { className: 'mt-2 text-sm text-slate-300' }, 'A structured React entrypoint for all major modules with stable data wiring, while Blade routes stay as fallback.')
                             ),
                             React.createElement('button', {
                                 type: 'button',
                                 onClick: hydrate,
-                                className: 'rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-100 hover:bg-slate-700',
+                                className: 'rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-sm text-slate-100 hover:border-indigo-400/60 hover:bg-slate-700',
                             }, loading ? 'Refreshing…' : 'Refresh data')
                         ),
 
@@ -140,7 +141,7 @@
                                 type: 'button',
                                 onClick: () => setActiveSection(key),
                                 className: key === activeSection
-                                    ? 'rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white'
+                                    ? 'rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-3 py-1.5 text-sm font-medium text-white'
                                     : 'rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-200 hover:border-slate-500',
                             }, sectionMeta[key].label))
                         ),
@@ -155,7 +156,7 @@
                     ),
 
                     React.createElement('aside', { className: 'space-y-6 lg:col-span-4' },
-                        React.createElement('section', { className: 'rounded-2xl border border-slate-800 bg-slate-900/70 p-5' },
+                        React.createElement('section', { className: 'rounded-2xl border border-indigo-400/20 bg-slate-900/75 p-5' },
                             React.createElement('h2', { className: 'text-lg font-semibold text-white' }, 'Quick links'),
                             React.createElement('div', { className: 'mt-3 grid gap-2' },
                                 ...Object.values(sectionMeta).map((item) => React.createElement('a', {
@@ -166,7 +167,7 @@
                             )
                         ),
 
-                        React.createElement('section', { className: 'rounded-2xl border border-slate-800 bg-slate-900/70 p-5' },
+                        React.createElement('section', { className: 'rounded-2xl border border-indigo-400/20 bg-slate-900/75 p-5' },
                             React.createElement('div', { className: 'mb-3 flex items-center justify-between' },
                                 React.createElement('h2', { className: 'text-lg font-semibold text-white' }, 'Feed preview'),
                                 React.createElement('a', { href: '/labs/feed-react', className: 'text-xs text-indigo-300 hover:text-indigo-200' }, 'Open full feed')
