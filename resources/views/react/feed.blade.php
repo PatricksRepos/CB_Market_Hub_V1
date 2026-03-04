@@ -72,6 +72,7 @@
 
             const fetchFeed = (nextType, nextQ, nextPage, append = false) => {
                 setLoading(true);
+                setError('');
                 const query = new URLSearchParams();
 
                 if (nextType !== 'all') query.set('type', nextType);
@@ -99,7 +100,7 @@
                         setTotal(Number(data.pagination?.total || 0));
                         setPage(nextPage);
                     })
-                    .catch(() => setError('Failed to load feed items.'))
+                    .catch((err) => setError(err?.message || 'Failed to load feed items.'))
                     .finally(() => setLoading(false));
             };
 
