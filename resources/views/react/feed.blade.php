@@ -28,7 +28,7 @@
             { label: 'Feed', href: '/' },
             { label: 'Posts', href: '/posts' },
             { label: 'Polls', href: '/polls' },
-            { label: 'Marketplace', href: '/listings' },
+            { label: 'Marketplace', href: '/marketplace' },
             { label: 'Events', href: '/events' },
             { label: 'Suggestions', href: '/suggestions' },
             { label: 'Chat', href: '/chat' },

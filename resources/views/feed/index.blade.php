@@ -18,7 +18,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-5">
             <div class="rounded-lg border border-indigo-200 bg-indigo-50 p-4 text-sm text-indigo-900 flex items-center justify-between gap-3">
                 <span>Want to preview the new React frontend feed?</span>
-                <a href="{{ route('react.feed-page') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-500">Open React Feed</a>
+                <a href="{{ route('react.app') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-500">Open React App</a>
             </div>
             <div class="bg-white shadow-sm rounded-lg p-5">
                 <form method="GET" action="{{ route('feed.index') }}" class="grid gap-3 sm:grid-cols-12 sm:items-end">

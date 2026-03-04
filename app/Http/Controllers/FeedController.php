@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChatMessage;
 use App\Models\Event;
 use App\Models\Listing;
 use App\Models\Poll;
@@ -90,6 +91,66 @@ class FeedController extends Controller
             'events' => Event::query()->where('is_public', true)->count(),
             'suggestions' => Suggestion::query()->count(),
             'listings' => Listing::query()->where('is_active', true)->count(),
+        ]);
+    }
+
+
+    public function reactSiteOverview()
+    {
+        return response()->json([
+            'counts' => [
+                'feed' => $this->collectFeedItems(false)->count(),
+                'posts' => Post::query()->count(),
+                'polls' => Poll::query()->count(),
+                'marketplace' => Listing::query()->where('is_active', true)->count(),
+                'events' => Event::query()->where('is_public', true)->count(),
+                'suggestions' => Suggestion::query()->count(),
+                'chat' => ChatMessage::query()->count(),
+            ],
+            'sections' => [
+                'posts' => Post::query()->latest()->with('user')->take(5)->get()->map(fn (Post $post) => [
+                    'title' => (string) ($post->title ?? 'Post #'.$post->id),
+                    'excerpt' => Str::limit((string) ($post->body ?? ''), 120),
+                    'author' => (string) optional($post->user)->name,
+                    'href' => route('posts.show', $post),
+                    'created_at' => optional($post->created_at)->toIso8601String(),
+                ])->values(),
+                'polls' => Poll::query()->latest()->with('user')->take(5)->get()->map(fn (Poll $poll) => [
+                    'title' => (string) ($poll->question ?? 'Poll #'.$poll->id),
+                    'excerpt' => 'Community poll',
+                    'author' => (string) optional($poll->user)->name,
+                    'href' => route('polls.show', $poll),
+                    'created_at' => optional($poll->created_at)->toIso8601String(),
+                ])->values(),
+                'marketplace' => Listing::query()->where('is_active', true)->latest()->with('user')->take(5)->get()->map(fn (Listing $listing) => [
+                    'title' => (string) ($listing->title ?? 'Listing #'.$listing->id),
+                    'excerpt' => Str::limit((string) ($listing->body ?? ''), 120),
+                    'author' => (string) optional($listing->user)->name,
+                    'href' => route('listings.show', $listing),
+                    'created_at' => optional($listing->created_at)->toIso8601String(),
+                ])->values(),
+                'events' => Event::query()->where('is_public', true)->latest()->with('user')->take(5)->get()->map(fn (Event $event) => [
+                    'title' => (string) ($event->title ?? 'Event #'.$event->id),
+                    'excerpt' => Str::limit((string) ($event->description ?? ''), 120),
+                    'author' => (string) optional($event->user)->name,
+                    'href' => route('events.show', $event),
+                    'created_at' => optional($event->created_at)->toIso8601String(),
+                ])->values(),
+                'suggestions' => Suggestion::query()->latest()->with('user')->take(5)->get()->map(fn (Suggestion $suggestion) => [
+                    'title' => (string) ($suggestion->title ?? 'Suggestion #'.$suggestion->id),
+                    'excerpt' => Str::limit((string) ($suggestion->body ?? ''), 120),
+                    'author' => (string) optional($suggestion->user)->name,
+                    'href' => route('suggestions.show', $suggestion),
+                    'created_at' => optional($suggestion->created_at)->toIso8601String(),
+                ])->values(),
+                'chat' => ChatMessage::query()->latest()->with('user')->take(5)->get()->map(fn (ChatMessage $message) => [
+                    'title' => 'Chat message',
+                    'excerpt' => Str::limit((string) ($message->body ?? ''), 120),
+                    'author' => (string) optional($message->user)->name,
+                    'href' => route('chat.index'),
+                    'created_at' => optional($message->created_at)->toIso8601String(),
+                ])->values(),
+            ],
         ]);
     }
 
