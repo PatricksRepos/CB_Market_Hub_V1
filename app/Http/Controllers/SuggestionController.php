@@ -41,14 +41,11 @@ class SuggestionController extends Controller
 
     public function create()
     {
-        $this->middleware(['auth','verified']);
         return view('suggestions.create');
     }
 
     public function store(Request $request)
     {
-        $this->middleware(['auth','verified']);
-
         $data = $request->validate([
             'title' => ['required','string','min:3','max:140'],
             'body' => ['nullable','string','max:6000'],
@@ -66,10 +63,43 @@ class SuggestionController extends Controller
         return redirect()->route('suggestions.show', $s)->with('status','Suggestion posted.');
     }
 
+    public function edit(Request $request, Suggestion $suggestion)
+    {
+        abort_unless($suggestion->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+
+        return view('suggestions.edit', compact('suggestion'));
+    }
+
+    public function update(Request $request, Suggestion $suggestion)
+    {
+        abort_unless($suggestion->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+
+        $data = $request->validate([
+            'title' => ['required','string','min:3','max:140'],
+            'body' => ['nullable','string','max:6000'],
+            'is_anonymous' => ['nullable'],
+        ]);
+
+        $suggestion->update([
+            'title' => $data['title'],
+            'body' => $data['body'] ?? null,
+            'is_anonymous' => (bool)($data['is_anonymous'] ?? false),
+        ]);
+
+        return redirect()->route('suggestions.show', $suggestion)->with('status', 'Suggestion updated.');
+    }
+
+    public function destroy(Request $request, Suggestion $suggestion)
+    {
+        abort_unless($suggestion->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+
+        $suggestion->delete();
+
+        return redirect()->route('suggestions.index')->with('status', 'Suggestion deleted.');
+    }
+
     public function vote(Request $request, Suggestion $suggestion)
     {
-        $this->middleware(['auth','verified']);
-
         SuggestionVote::firstOrCreate([
             'suggestion_id' => $suggestion->id,
             'user_id' => $request->user()->id,
@@ -80,8 +110,6 @@ class SuggestionController extends Controller
 
     public function unvote(Request $request, Suggestion $suggestion)
     {
-        $this->middleware(['auth','verified']);
-
         SuggestionVote::where('suggestion_id',$suggestion->id)
             ->where('user_id',$request->user()->id)
             ->delete();
@@ -91,8 +119,6 @@ class SuggestionController extends Controller
 
     public function report(Request $request, Suggestion $suggestion)
     {
-        $this->middleware(['auth','verified']);
-
         $data = $request->validate([
             'reason' => ['nullable','string','max:120'],
         ]);
@@ -108,8 +134,6 @@ class SuggestionController extends Controller
 
     public function setStatus(Request $request, Suggestion $suggestion)
     {
-        $this->middleware(['auth','verified']);
-
         if (!$request->user()->isAdmin()) abort(403);
 
         $data = $request->validate([
