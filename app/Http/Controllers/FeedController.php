@@ -11,8 +11,8 @@ class FeedController extends Controller
 {
     public function index()
     {
-        $posts = Post::query()->latest()->take(10)->get();
-        $polls = Poll::query()->latest()->take(10)->get();
+        $posts = Post::query()->with(['user', 'images'])->latest()->take(10)->get();
+        $polls = Poll::query()->with('user')->latest()->take(10)->get();
         $postComments = PostComment::query()->latest()->with(['user','post'])->take(10)->get();
         $pollComments = PollComment::query()->latest()->with(['user','poll'])->take(10)->get();
 
