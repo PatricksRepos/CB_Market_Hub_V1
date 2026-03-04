@@ -15,6 +15,7 @@ use App\Http\Controllers\PollCommentController;
 
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\ReactionController;
 
 Route::get('/', [FeedController::class, 'index'])->name('feed.index');
 
@@ -64,6 +65,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/posts/{post}/comments/{comment}', [PostCommentController::class, 'destroy'])->name('posts.comments.destroy');
 
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+
+    Route::post('/reactions', [ReactionController::class, 'store'])->name('reactions.store');
 });
 
 /*
@@ -115,7 +118,7 @@ Route::get('/events/{event}', [EventController::class, 'show'])->name('events.sh
 Route::middleware(['auth'])->group(function () {
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
     Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
-    Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
+    Route::match(['put', 'patch'], '/events/{event}', [EventController::class, 'update'])->name('events.update');
     Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
     Route::post('/events/{event}/rsvp', [EventController::class, 'rsvp'])->name('events.rsvp');
 });

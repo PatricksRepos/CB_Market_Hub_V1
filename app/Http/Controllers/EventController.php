@@ -25,7 +25,7 @@ class EventController extends Controller
 
     public function show(Event $event, Request $request): View
     {
-        $event->load(['user', 'rsvps.user']);
+        $event->load(['user', 'rsvps.user', 'reactions']);
 
         $my = null;
         if ($request->user()) {

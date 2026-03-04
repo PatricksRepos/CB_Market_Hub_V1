@@ -38,6 +38,8 @@
                     </div>
                 </div>
 
+                <x-reaction-bar :model="$poll" type="poll" />
+
                 @auth
                     @if ($poll->ends_at && now()->gte($poll->ends_at))
                         <div class="text-gray-700">Voting is closed.</div>
@@ -165,7 +167,7 @@
                 @endauth
 
                 <div class="space-y-4">
-                    @forelse ($poll->comments()->latest()->get() as $comment)
+                    @forelse ($poll->comments->sortByDesc('created_at') as $comment)
                         <div class="rounded-lg border p-3">
                             <div class="flex items-center justify-between">
                                 <div class="text-sm text-gray-700 font-medium">
@@ -186,6 +188,7 @@
                             </div>
 
                             <div class="mt-2 text-gray-800 whitespace-pre-wrap">{{ $comment->body }}</div>
+                            <x-reaction-bar :model="$comment" type="poll_comment" />
                         </div>
                     @empty
                         <div class="text-gray-600">No comments yet.</div>

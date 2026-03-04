@@ -99,7 +99,7 @@ class PollController extends Controller
 
     public function show(Poll $poll, Request $request)
     {
-        $poll->load(['options','votes','comments.user']);
+        $poll->load(['options','votes','reactions','comments.user','comments.reactions']);
 
         $user = $request->user();
         $myVote = null;

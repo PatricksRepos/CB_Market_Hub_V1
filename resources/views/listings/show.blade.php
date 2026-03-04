@@ -42,6 +42,8 @@
                     <div class="mt-5 text-gray-600">No details provided.</div>
                 @endif
 
+                <x-reaction-bar :model="$listing" type="listing" />
+
                 @auth
                     @if(auth()->id() === $listing->user_id || auth()->user()->isAdmin())
                         <div class="mt-5 flex items-center gap-2">

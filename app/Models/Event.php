@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Event extends Model
 {
@@ -32,4 +33,10 @@ class Event extends Model
     {
         return $this->hasMany(EventRsvp::class);
     }
+
+    public function reactions(): MorphMany
+    {
+        return $this->morphMany(Reaction::class, 'reactable');
+    }
+
 }

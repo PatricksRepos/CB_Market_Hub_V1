@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Suggestion extends Model
 {
@@ -15,4 +16,10 @@ class Suggestion extends Model
     public function user() { return $this->belongsTo(User::class); }
     public function votes() { return $this->hasMany(SuggestionVote::class); }
     public function reports() { return $this->hasMany(SuggestionReport::class); }
+
+    public function reactions(): MorphMany
+    {
+        return $this->morphMany(Reaction::class, 'reactable');
+    }
+
 }

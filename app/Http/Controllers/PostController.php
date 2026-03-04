@@ -82,7 +82,7 @@ class PostController extends Controller
     {
         abort_if($post->is_hidden, 404);
 
-        $post->load(['images', 'user', 'category.parent']);
+        $post->load(['images', 'user', 'category.parent', 'reactions']);
 
         return view('posts.show', compact('post'));
     }

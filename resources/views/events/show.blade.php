@@ -32,6 +32,8 @@
                     <div class="mt-4 whitespace-pre-wrap text-gray-800">{{ $event->description }}</div>
                 @endif
 
+                <x-reaction-bar :model="$event" type="event" />
+
                 @auth
                     @if(auth()->id() === $event->user_id || auth()->user()->isAdmin())
                         <div class="mt-5 flex items-center gap-2">

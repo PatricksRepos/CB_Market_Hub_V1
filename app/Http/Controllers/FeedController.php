@@ -14,13 +14,13 @@ class FeedController extends Controller
 {
     public function index()
     {
-        $posts = Post::query()->with(['user', 'images'])->latest()->take(12)->get();
-        $polls = Poll::query()->with('user')->latest()->take(8)->get();
+        $posts = Post::query()->with(['user', 'images', 'reactions'])->latest()->take(12)->get();
+        $polls = Poll::query()->with(['user', 'reactions'])->latest()->take(8)->get();
         $postComments = PostComment::query()->latest()->with(['user', 'post'])->take(8)->get();
-        $pollComments = PollComment::query()->latest()->with(['user', 'poll'])->take(8)->get();
-        $events = Event::query()->where('is_public', true)->with('user')->latest()->take(8)->get();
-        $suggestions = Suggestion::query()->with('user')->latest()->take(8)->get();
-        $listings = Listing::query()->where('is_active', true)->with('user')->latest()->take(8)->get();
+        $pollComments = PollComment::query()->latest()->with(['user', 'poll', 'reactions'])->take(8)->get();
+        $events = Event::query()->where('is_public', true)->with(['user', 'reactions'])->latest()->take(8)->get();
+        $suggestions = Suggestion::query()->with(['user', 'reactions'])->latest()->take(8)->get();
+        $listings = Listing::query()->where('is_active', true)->with(['user', 'reactions'])->latest()->take(8)->get();
 
         $items = collect()
             ->concat($posts->map(fn ($p) => ['type' => 'post', 'at' => $p->created_at, 'data' => $p]))

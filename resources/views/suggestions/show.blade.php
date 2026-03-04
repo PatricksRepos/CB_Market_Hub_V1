@@ -30,7 +30,9 @@
                 @endif
 
                 <div class="pt-3 flex flex-wrap gap-2">
-                    @auth
+                    <x-reaction-bar :model="$suggestion" type="suggestion" />
+
+                @auth
                         @if($hasVoted)
                             <form method="POST" action="{{ route('suggestions.unvote',$suggestion) }}">
                                 @csrf
