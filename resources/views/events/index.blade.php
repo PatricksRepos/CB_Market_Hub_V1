@@ -3,7 +3,6 @@
         <div class="flex items-center justify-between gap-3">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Events</h2>
             @auth
-                <a href="{{ route('events.create') }}" class="px-3 py-2 rounded bg-gray-900 text-white text-sm hover:bg-gray-800">Create Event</a>
                 <a class="rounded-lg bg-gray-900 text-white px-4 py-2.5 font-semibold hover:bg-gray-800" href="{{ route('events.create') }}">New event</a>
             @endauth
         </div>

@@ -39,13 +39,7 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'title' => ['required','string','max:160'],
-            'description' => ['nullable','string','max:6000'],
-            'location' => ['nullable','string','max:160'],
-            'starts_at' => ['required','date'],
-            'ends_at' => ['nullable','date','after_or_equal:starts_at'],
-        ]);
+        $data = $this->validateData($request);
 
         $event = Event::create([
             'user_id' => $request->user()->id,
@@ -60,6 +54,39 @@ class EventController extends Controller
         return redirect()->route('events.show', $event)->with('status','Event created.');
     }
 
+    public function edit(Request $request, Event $event)
+    {
+        abort_unless($event->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+
+        return view('events.edit', compact('event'));
+    }
+
+    public function update(Request $request, Event $event)
+    {
+        abort_unless($event->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+
+        $data = $this->validateData($request);
+
+        $event->update([
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'location' => $data['location'] ?? null,
+            'starts_at' => $data['starts_at'],
+            'ends_at' => $data['ends_at'] ?? null,
+        ]);
+
+        return redirect()->route('events.show', $event)->with('status','Event updated.');
+    }
+
+    public function destroy(Request $request, Event $event)
+    {
+        abort_unless($event->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+
+        $event->delete();
+
+        return redirect()->route('events.index')->with('status', 'Event deleted.');
+    }
+
     public function rsvp(Request $request, Event $event)
     {
         $data = $request->validate([
@@ -72,5 +99,16 @@ class EventController extends Controller
         );
 
         return back()->with('status','RSVP saved.');
+    }
+
+    private function validateData(Request $request): array
+    {
+        return $request->validate([
+            'title' => ['required','string','max:160'],
+            'description' => ['nullable','string','max:6000'],
+            'location' => ['nullable','string','max:160'],
+            'starts_at' => ['required','date'],
+            'ends_at' => ['nullable','date','after_or_equal:starts_at'],
+        ]);
     }
 }

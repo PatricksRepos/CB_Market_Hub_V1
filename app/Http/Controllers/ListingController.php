@@ -31,27 +31,68 @@ class ListingController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'title' => ['required','string','max:120'],
-            'body' => ['nullable','string','max:4000'],
-            'price' => ['nullable','numeric','min:0','max:100000'],
-            'location' => ['nullable','string','max:120'],
-            'category' => ['required','in:general,buy,sell,trade,services'],
-        ]);
-
-        $priceCents = null;
-        if ($data['price'] !== null) $priceCents = (int) round(((float)$data['price']) * 100);
+        $data = $this->validateData($request);
 
         $listing = Listing::create([
             'user_id' => $request->user()->id,
             'title' => $data['title'],
             'body' => $data['body'] ?? null,
-            'price_cents' => $priceCents,
+            'price_cents' => $this->toPriceCents($data['price'] ?? null),
             'location' => $data['location'] ?? null,
             'category' => $data['category'],
             'is_active' => true,
         ]);
 
         return redirect()->route('listings.show', $listing)->with('status','Listing posted.');
+    }
+
+    public function edit(Request $request, Listing $listing)
+    {
+        abort_unless($listing->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+        return view('listings.edit', compact('listing'));
+    }
+
+    public function update(Request $request, Listing $listing)
+    {
+        abort_unless($listing->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+
+        $data = $this->validateData($request);
+
+        $listing->update([
+            'title' => $data['title'],
+            'body' => $data['body'] ?? null,
+            'price_cents' => $this->toPriceCents($data['price'] ?? null),
+            'location' => $data['location'] ?? null,
+            'category' => $data['category'],
+        ]);
+
+        return redirect()->route('listings.show', $listing)->with('status', 'Listing updated.');
+    }
+
+    public function destroy(Request $request, Listing $listing)
+    {
+        abort_unless($listing->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
+
+        $listing->delete();
+
+        return redirect()->route('listings.index')->with('status', 'Listing deleted.');
+    }
+
+    private function validateData(Request $request): array
+    {
+        return $request->validate([
+            'title' => ['required','string','max:120'],
+            'body' => ['nullable','string','max:4000'],
+            'price' => ['nullable','numeric','min:0','max:100000'],
+            'location' => ['nullable','string','max:120'],
+            'category' => ['required','in:general,buy,sell,trade,services'],
+        ]);
+    }
+
+    private function toPriceCents($price): ?int
+    {
+        if ($price === null || $price === '') return null;
+
+        return (int) round(((float)$price) * 100);
     }
 }

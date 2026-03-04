@@ -21,11 +21,6 @@ Route::get('/', [FeedController::class, 'index'])->name('feed.index');
 Route::middleware(['auth','verified'])->get('/dashboard', function () {
     return redirect()->route('feed.index');
 })->name('dashboard');
-Route::get('/events', [\App\Http\Controllers\EventController::class, 'index'])->name('events.index');
-Route::get('/events/create', [\App\Http\Controllers\EventController::class, 'create'])->name('events.create');
-Route::post('/events', [\App\Http\Controllers\EventController::class, 'store'])->name('events.store');
-Route::get('/events/{event}', [\App\Http\Controllers\EventController::class, 'show'])->name('events.show');
-
 /*
 |--------------------------------------------------------------------------
 | Profiles
@@ -102,6 +97,9 @@ Route::get('/marketplace/{listing}', [ListingController::class, 'show'])->name('
 Route::middleware(['auth','verified'])->group(function () {
     Route::get('/marketplace/create', [ListingController::class, 'create'])->name('listings.create');
     Route::post('/marketplace', [ListingController::class, 'store'])->name('listings.store');
+    Route::get('/marketplace/{listing}/edit', [ListingController::class, 'edit'])->name('listings.edit');
+    Route::put('/marketplace/{listing}', [ListingController::class, 'update'])->name('listings.update');
+    Route::delete('/marketplace/{listing}', [ListingController::class, 'destroy'])->name('listings.destroy');
 });
 
 /*
@@ -115,6 +113,9 @@ Route::get('/events/{event}', [EventController::class, 'show'])->name('events.sh
 Route::middleware(['auth','verified'])->group(function () {
     Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
+    Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
+    Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
     Route::post('/events/{event}/rsvp', [EventController::class, 'rsvp'])->name('events.rsvp');
 });
 /*
@@ -129,6 +130,11 @@ Route::post('/suggestions', [\App\Http\Controllers\SuggestionController::class, 
 Route::get('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'show'])->name('suggestions.show');
 Route::post('/suggestions/{suggestion}/vote', [\App\Http\Controllers\SuggestionController::class, 'vote'])->middleware(['auth','verified'])->name('suggestions.vote');
 Route::delete('/suggestions/{suggestion}/vote', [\App\Http\Controllers\SuggestionController::class, 'unvote'])->middleware(['auth','verified'])->name('suggestions.unvote');
+Route::post('/suggestions/{suggestion}/report', [\App\Http\Controllers\SuggestionController::class, 'report'])->middleware(['auth','verified'])->name('suggestions.report');
+Route::patch('/suggestions/{suggestion}/status', [\App\Http\Controllers\SuggestionController::class, 'setStatus'])->middleware(['auth','verified'])->name('suggestions.status');
+Route::get('/suggestions/{suggestion}/edit', [\App\Http\Controllers\SuggestionController::class, 'edit'])->middleware(['auth','verified'])->name('suggestions.edit');
+Route::put('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'update'])->middleware(['auth','verified'])->name('suggestions.update');
+Route::delete('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'destroy'])->middleware(['auth','verified'])->name('suggestions.destroy');
 
 
 /*

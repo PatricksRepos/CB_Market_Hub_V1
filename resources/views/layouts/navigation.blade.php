@@ -10,11 +10,8 @@
                     <a href="{{ route('polls.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('polls.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Polls</a>
                     <a href="{{ route('listings.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('listings.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Marketplace</a>
                     <a href="{{ route('events.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Events</a>
-                   <a href="{{ route('chat.index') }}"
-   class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium
-   {{ request()->routeIs('chat.*') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-   Chat
-</a>
+                    <a href="{{ route('suggestions.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Suggestions</a>
+                    <a href="{{ route('chat.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Chat</a>
                 </div>
             </div>
 
@@ -58,8 +55,8 @@
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('feed.index') }}">Feed</a>
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('posts.index') }}">Posts</a>
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('polls.index') }}">Polls</a>
-                    <a href="{{ route('suggestions.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Suggestions</a>
-                    <a href="{{ route('chat.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Chat</a>
+            <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('suggestions.index') }}">Suggestions</a>
+            <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('chat.index') }}">Chat</a>
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('listings.index') }}">Marketplace</a>
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('events.index') }}">Events</a>
         </div>

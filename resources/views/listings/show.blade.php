@@ -41,6 +41,19 @@
                 @else
                     <div class="mt-5 text-gray-600">No details provided.</div>
                 @endif
+
+                @auth
+                    @if(auth()->id() === $listing->user_id || auth()->user()->isAdmin())
+                        <div class="mt-5 flex items-center gap-2">
+                            <a class="rounded-lg border px-4 py-2 hover:bg-gray-50" href="{{ route('listings.edit', $listing) }}">Edit</a>
+                            <form method="POST" action="{{ route('listings.destroy', $listing) }}" onsubmit="return confirm('Delete this listing?');">
+                                @csrf
+                                @method('DELETE')
+                                <button class="rounded-lg bg-red-600 text-white px-4 py-2 hover:bg-red-700" type="submit">Delete</button>
+                            </form>
+                        </div>
+                    @endif
+                @endauth
             </div>
         </div>
     </div>
