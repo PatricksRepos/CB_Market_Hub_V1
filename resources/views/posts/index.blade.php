@@ -19,6 +19,9 @@
         <option value="">All Categories</option>
         @foreach($categories as $cat)
           <option value="{{ $cat->id }}" @selected(request('category') == $cat->id)>{{ $cat->name }}</option>
+          @foreach($cat->children as $child)
+            <option value="{{ $child->id }}" @selected(request('category') == $child->id)>— {{ $child->name }}</option>
+          @endforeach
         @endforeach
       </select>
 
@@ -34,7 +37,9 @@
         <div class="p-4 border rounded">
           <div class="text-sm opacity-70">
             {{ $post->type }}
-            @if($post->category) • {{ $post->category->name }} @endif
+            @if($post->category)
+              • {{ $post->category->parent ? $post->category->parent->name.' › '.$post->category->name : $post->category->name }}
+            @endif
             @if($post->is_promoted) • PROMOTED @endif
           </div>
 
