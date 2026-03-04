@@ -29,7 +29,8 @@ Route::middleware(['auth','verified'])->get('/dashboard', function () {
 Route::get('/u/{user}', [ProfileController::class, 'show'])->name('profiles.show');
 Route::middleware(['auth','verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profiles.edit');
-    Route::post('/profile', [ProfileController::class, 'update'])->name('profiles.update');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profiles.update');
+    Route::post('/profile', [ProfileController::class, 'update']);
 });
 
 /*
@@ -49,10 +50,10 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+Route::get('/posts/create', [PostController::class, 'create'])->middleware(['auth','verified'])->name('posts.create');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
 Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
 
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
@@ -71,10 +72,10 @@ Route::middleware(['auth','verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/polls', [PollController::class, 'index'])->name('polls.index');
+Route::get('/polls/create', [PollController::class, 'create'])->middleware(['auth','verified'])->name('polls.create');
 Route::get('/polls/{poll}', [PollController::class, 'show'])->name('polls.show');
 
 Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/polls/create', [PollController::class, 'create'])->name('polls.create');
     Route::post('/polls', [PollController::class, 'store'])->middleware('throttle:5,60')->name('polls.store');
 
     Route::post('/polls/{poll}/vote', [PollController::class, 'vote'])->name('polls.vote');
@@ -92,10 +93,10 @@ Route::middleware(['auth','verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/marketplace', [ListingController::class, 'index'])->name('listings.index');
+Route::get('/marketplace/create', [ListingController::class, 'create'])->middleware(['auth','verified'])->name('listings.create');
 Route::get('/marketplace/{listing}', [ListingController::class, 'show'])->name('listings.show');
 
 Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/marketplace/create', [ListingController::class, 'create'])->name('listings.create');
     Route::post('/marketplace', [ListingController::class, 'store'])->name('listings.store');
     Route::get('/marketplace/{listing}/edit', [ListingController::class, 'edit'])->name('listings.edit');
     Route::put('/marketplace/{listing}', [ListingController::class, 'update'])->name('listings.update');
@@ -108,10 +109,10 @@ Route::middleware(['auth','verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
+Route::get('/events/create', [EventController::class, 'create'])->middleware(['auth','verified'])->name('events.create');
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 
 Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
     Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
     Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
