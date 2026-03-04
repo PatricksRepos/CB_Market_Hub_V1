@@ -26,7 +26,7 @@
             React.createElement('p', { className: 'text-xs uppercase tracking-wide text-indigo-600' }, item.type),
             React.createElement('h3', { className: 'mt-1 text-base font-semibold text-slate-900' }, item.title || '(untitled)'),
             React.createElement('p', { className: 'mt-2 text-sm text-slate-600' }, item.excerpt || ''),
-            React.createElement('p', { className: 'mt-3 text-xs text-slate-500' }, `By ${item.author || 'Unknown'} • ${new Date(item.created_at).toLocaleString()}`)
+            React.createElement('p', { className: 'mt-3 text-xs text-slate-500' }, `By ${item.author || 'Unknown'} • ${item.created_at ? new Date(item.created_at).toLocaleString() : 'Unknown time'}`)
         );
 
         const App = () => {
@@ -125,7 +125,9 @@
                                 React.createElement('option', { value: 'poll' }, 'Polls'),
                                 React.createElement('option', { value: 'event' }, 'Events'),
                                 React.createElement('option', { value: 'suggestion' }, 'Suggestions'),
-                                React.createElement('option', { value: 'listing' }, 'Listings')
+                                React.createElement('option', { value: 'listing' }, 'Listings'),
+                                React.createElement('option', { value: 'post_comment' }, 'Post comments'),
+                                React.createElement('option', { value: 'poll_comment' }, 'Poll comments')
                             ),
                             React.createElement('input', {
                                 className: 'rounded-md border border-slate-300 px-3 py-2 text-sm md:col-span-2',

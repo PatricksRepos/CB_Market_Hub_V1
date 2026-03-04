@@ -6,6 +6,8 @@ use App\Models\Event;
 use App\Models\Listing;
 use App\Models\Poll;
 use App\Models\Post;
+use App\Models\PostComment;
+use App\Models\PollComment;
 use App\Models\Suggestion;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -73,6 +75,22 @@ class ReactFeedEndpointTest extends TestCase
             'updated_at' => now()->subMinute(),
         ]);
 
+        PostComment::query()->create([
+            'post_id' => Post::query()->firstOrFail()->id,
+            'user_id' => $user->id,
+            'body' => 'Post comment sample',
+            'created_at' => now()->subSeconds(30),
+            'updated_at' => now()->subSeconds(30),
+        ]);
+
+        PollComment::query()->create([
+            'poll_id' => Poll::query()->firstOrFail()->id,
+            'user_id' => $user->id,
+            'body' => 'Poll comment sample',
+            'created_at' => now()->subSeconds(20),
+            'updated_at' => now()->subSeconds(20),
+        ]);
+
         $response = $this->getJson(route('react.feed'));
 
         $response->assertOk();
@@ -98,6 +116,8 @@ class ReactFeedEndpointTest extends TestCase
         $this->assertContains('event', array_column($items, 'type'));
         $this->assertContains('suggestion', array_column($items, 'type'));
         $this->assertContains('listing', array_column($items, 'type'));
+        $this->assertContains('post_comment', array_column($items, 'type'));
+        $this->assertContains('poll_comment', array_column($items, 'type'));
     }
 
     public function test_react_feed_endpoint_applies_type_and_search_filters(): void
@@ -139,4 +159,33 @@ class ReactFeedEndpointTest extends TestCase
         $this->assertSame('post', $items[0]['type']);
         $this->assertSame('Antenna tuning guide', $items[0]['title']);
     }
+
+    public function test_react_feed_endpoint_can_filter_comment_types(): void
+    {
+        $user = User::factory()->create();
+
+        $post = Post::query()->create([
+            'user_id' => $user->id,
+            'type' => 'discussion',
+            'title' => 'Parent post',
+            'body' => 'Parent body',
+        ]);
+
+        PostComment::query()->create([
+            'post_id' => $post->id,
+            'user_id' => $user->id,
+            'body' => 'Need help with antenna grounding',
+        ]);
+
+        $response = $this->getJson(route('react.feed', ['type' => 'post_comment', 'q' => 'grounding']));
+
+        $response->assertOk();
+        $response->assertJsonPath('type', 'post_comment');
+
+        $items = $response->json('items');
+
+        $this->assertCount(1, $items);
+        $this->assertSame('post_comment', $items[0]['type']);
+    }
+
 }
