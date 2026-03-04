@@ -12,6 +12,7 @@ class EventController extends Controller
     {
         $events = Event::query()
             ->where('is_public', true)
+            ->with('user')
             ->orderBy('starts_at', 'asc')
             ->paginate(20);
 

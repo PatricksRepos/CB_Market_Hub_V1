@@ -37,6 +37,7 @@ class ChatController extends Controller
                     'body' => $message->body,
                     'is_deleted' => (bool) $message->is_deleted,
                     'created_at' => $message->created_at?->diffForHumans(),
+                    'avatar_url' => $message->user?->avatar_url,
                 ];
             });
 

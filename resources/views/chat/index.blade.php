@@ -18,14 +18,26 @@
                     @foreach($messages as $m)
                         @php $lastId = max($lastId, $m->id); @endphp
                         <div class="border rounded-lg p-2">
-                            <div class="flex items-center justify-between gap-2">
-                                <div class="text-sm font-semibold text-gray-800">
-                                    @if($m->is_deleted)
-                                        Message removed
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex items-start gap-3">
+                                    @if($m->user?->avatar_url)
+                                        <img src="{{ $m->user->avatar_url }}" alt="{{ $m->user?->name ?? 'User' }} avatar" class="h-16 w-16 rounded-full object-cover border">
                                     @else
-                                        {{ $m->user?->name ?? 'User' }}
+                                        <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xl font-semibold">{{ strtoupper(substr($m->user?->name ?? 'U',0,1)) }}</div>
                                     @endif
-                                    <span class="text-xs font-normal text-gray-500">• {{ $m->created_at->diffForHumans() }}</span>
+
+                                    <div class="text-sm font-semibold text-gray-800">
+                                        @if($m->is_deleted)
+                                            Message removed
+                                        @else
+                                            {{ $m->user?->name ?? 'User' }}
+                                        @endif
+                                        <span class="text-xs font-normal text-gray-500">• {{ $m->created_at->diffForHumans() }}</span>
+
+                                        @if(!$m->is_deleted)
+                                            <div class="mt-1 text-gray-800 whitespace-pre-wrap font-normal">{{ $m->body }}</div>
+                                        @endif
+                                    </div>
                                 </div>
 
                                 <div class="flex gap-2">
@@ -45,10 +57,6 @@
                                     @endauth
                                 </div>
                             </div>
-
-                            @if(!$m->is_deleted)
-                                <div class="text-gray-800 whitespace-pre-wrap">{{ $m->body }}</div>
-                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -101,28 +109,45 @@
                         wrap.className = "border rounded-lg p-2";
 
                         const header = document.createElement('div');
-                        header.className = "flex items-center justify-between gap-2";
+                        header.className = "flex items-start justify-between gap-2";
+
+                        const leftWrap = document.createElement('div');
+                        leftWrap.className = "flex items-start gap-3";
+
+                        let avatar;
+                        if (m.avatar_url) {
+                            avatar = document.createElement('img');
+                            avatar.src = m.avatar_url;
+                            avatar.alt = (m.name || 'User') + ' avatar';
+                            avatar.className = "h-16 w-16 rounded-full object-cover border";
+                        } else {
+                            avatar = document.createElement('div');
+                            avatar.className = "h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xl font-semibold";
+                            avatar.textContent = (m.name || 'U').slice(0, 1).toUpperCase();
+                        }
 
                         const left = document.createElement('div');
                         left.className = "text-sm font-semibold text-gray-800";
                         left.textContent = (m.is_deleted ? "Message removed" : m.name) + (m.created_at ? " • " + m.created_at : "");
 
+                        if (!m.is_deleted) {
+                            const body = document.createElement('div');
+                            body.className = "mt-1 text-gray-800 whitespace-pre-wrap font-normal";
+                            body.textContent = m.body;
+                            left.appendChild(body);
+                        }
+
+                        leftWrap.appendChild(avatar);
+                        leftWrap.appendChild(left);
+
                         const right = document.createElement('div');
                         right.className = "text-xs text-gray-400";
                         right.textContent = "";
 
-                        header.appendChild(left);
+                        header.appendChild(leftWrap);
                         header.appendChild(right);
 
                         wrap.appendChild(header);
-
-                        if (!m.is_deleted) {
-                            const body = document.createElement('div');
-                            body.className = "text-gray-800 whitespace-pre-wrap";
-                            body.textContent = m.body;
-                            wrap.appendChild(body);
-                        }
-
                         box.appendChild(wrap);
                     }
 
@@ -132,10 +157,7 @@
                 }
             }
 
-            // Start at bottom
             box.scrollTop = box.scrollHeight;
-
-            // Poll every 2.5s
             setInterval(poll, 2500);
         })();
     </script>

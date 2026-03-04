@@ -3,19 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\Listing;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class ListingController extends Controller
 {
     public function index(Request $request)
     {
-        $category = $request->query('category', 'all');
+        $category = $request->query('category', 'buy_sell');
 
         $q = Listing::query()->where('is_active', true)->with('user')->latest();
-        if ($category !== 'all') $q->where('category', $category);
+        if ($category === 'buy_sell') {
+            $q->whereIn('category', ['buy', 'sell']);
+        } elseif ($category !== 'all') {
+            $q->where('category', $category);
+        }
+
+        $postQuery = Post::query()
+            ->where('is_hidden', false)
+            ->whereNotNull('marketplace_action')
+            ->with(['user', 'images'])
+            ->latest();
+
+        if ($category === 'buy_sell') {
+            $postQuery->whereIn('marketplace_action', ['buy', 'sell']);
+        } elseif (in_array($category, ['buy', 'sell', 'trade'], true)) {
+            $postQuery->where('marketplace_action', $category);
+        }
 
         $listings = $q->paginate(20)->withQueryString();
-        return view('listings.index', compact('listings','category'));
+        $marketPosts = $postQuery->take(20)->get();
+
+        return view('listings.index', compact('listings', 'marketPosts', 'category'));
     }
 
     public function show(Listing $listing)

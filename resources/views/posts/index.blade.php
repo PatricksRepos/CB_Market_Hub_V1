@@ -45,9 +45,25 @@
             @if($post->is_promoted) • PROMOTED @endif
           </div>
 
-          <a class="text-lg underline" href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
+          <div class="mt-2 flex items-center gap-2 text-sm text-gray-600">
+            @if($post->user?->avatar_url)
+              <img src="{{ $post->user->avatar_url }}" alt="{{ $post->user->name }} avatar" class="h-16 w-16 rounded-full object-cover border">
+            @else
+              <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xs font-semibold">{{ strtoupper(substr($post->user?->name ?? 'U',0,1)) }}</div>
+            @endif
+            <span>{{ $post->is_anonymous ? ($post->anonymous_name ?? 'Anon') : ($post->user?->name ?? 'User') }}</span>
+            <span>• {{ $post->created_at->diffForHumans() }}</span>
+          </div>
 
-          <div class="text-sm opacity-70">
+          <a class="text-lg underline mt-2 inline-block" href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
+
+          @if($post->images->first())
+            <a href="{{ route('posts.show', $post) }}" class="block mt-2">
+              <img class="h-24 w-24 rounded border object-cover" src="{{ asset('storage/'.$post->images->first()->path) }}" alt="Post image thumbnail">
+            </a>
+          @endif
+
+          <div class="text-sm opacity-70 mt-2">
             @if($post->location) {{ $post->location }} @endif
             @if($post->price) • ${{ $post->price }} @endif
           </div>

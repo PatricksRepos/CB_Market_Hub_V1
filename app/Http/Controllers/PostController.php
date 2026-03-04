@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\PostImage;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -65,7 +66,7 @@ class PostController extends Controller
         if ($request->hasFile('images')) {
             $i = 0;
             foreach ($request->file('images') as $img) {
-                $path = $img->store('post-images', 'public');
+                $path = $this->storeOptimizedImage($img);
                 PostImage::create([
                     'post_id' => $post->id,
                     'path' => $path,
@@ -124,7 +125,7 @@ class PostController extends Controller
             $i = (int)($post->images()->max('sort_order') ?? -1) + 1;
 
             foreach ($request->file('images') as $img) {
-                $path = $img->store('post-images', 'public');
+                $path = $this->storeOptimizedImage($img);
                 PostImage::create([
                     'post_id' => $post->id,
                     'path' => $path,
@@ -169,8 +170,56 @@ class PostController extends Controller
             'condition' => 'nullable|string|max:60',
             'is_anonymous' => 'nullable|boolean',
             'anonymous_name' => 'nullable|string|max:60',
-            'images.*' => 'nullable|image|max:8192',
+            'images.*' => 'nullable|image|max:4096',
         ]);
+    }
+
+    private function storeOptimizedImage(UploadedFile $image): string
+    {
+        if (!function_exists('imagecreatefromstring') || !function_exists('imagewebp')) {
+            return $image->store('post-images', 'public');
+        }
+
+        $realPath = $image->getRealPath();
+        if (!$realPath) {
+            return $image->store('post-images', 'public');
+        }
+
+        $sourceData = @file_get_contents($realPath);
+        $source = $sourceData ? @imagecreatefromstring($sourceData) : false;
+        $dimensions = @getimagesize($realPath);
+
+        if (!$source || !$dimensions) {
+            return $image->store('post-images', 'public');
+        }
+
+        [$width, $height] = $dimensions;
+        $maxSide = 1600;
+        $scale = min(1, $maxSide / max($width, $height));
+        $newWidth = max(1, (int) round($width * $scale));
+        $newHeight = max(1, (int) round($height * $scale));
+
+        $canvas = imagecreatetruecolor($newWidth, $newHeight);
+        imagealphablending($canvas, false);
+        imagesavealpha($canvas, true);
+        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+        imagefill($canvas, 0, 0, $transparent);
+        imagecopyresampled($canvas, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        $path = 'post-images/' . Str::uuid() . '.webp';
+        Storage::disk('public')->makeDirectory('post-images');
+        $fullPath = Storage::disk('public')->path($path);
+
+        $written = imagewebp($canvas, $fullPath, 78);
+
+        imagedestroy($source);
+        imagedestroy($canvas);
+
+        if (!$written) {
+            return $image->store('post-images', 'public');
+        }
+
+        return $path;
     }
 
     private function resolveCategoryId(array $data): ?int

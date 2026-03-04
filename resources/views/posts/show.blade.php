@@ -2,13 +2,23 @@
   <x-slot name="header"><h2 class="font-semibold text-xl">{{ $post->title }}</h2></x-slot>
 
   <div class="p-6 space-y-4">
-    <div class="text-sm opacity-70">
+    <div class="flex items-center gap-2 text-sm opacity-70">
+      @if(!$post->is_anonymous)
+        @if($post->user?->avatar_url)
+          <img src="{{ $post->user->avatar_url }}" alt="{{ $post->user->name }} avatar" class="h-16 w-16 rounded-full object-cover border">
+        @else
+          <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xs font-semibold">{{ strtoupper(substr($post->user?->name ?? 'U',0,1)) }}</div>
+        @endif
+      @endif
+
       @if($post->category)
-      {{ $post->category->parent ? $post->category->parent->name.' › '.$post->category->name : $post->category->name }} •
-    @endif
+        {{ $post->category->parent ? $post->category->parent->name.' › '.$post->category->name : $post->category->name }} •
+      @endif
       Posted by:
-      @if($post->is_anonymous) {{ $post->anonymous_name ?? 'Anon' }}
-      @else {{ $post->user->name }}
+      @if($post->is_anonymous)
+        {{ $post->anonymous_name ?? 'Anon' }}
+      @else
+        <a class="underline" href="{{ route('profiles.show', $post->user) }}">{{ $post->user->name }}</a>
       @endif
       • {{ $post->created_at->diffForHumans() }}
     </div>
@@ -16,9 +26,9 @@
     <div class="border rounded p-4 whitespace-pre-wrap">{{ $post->body }}</div>
 
     @if($post->images->count())
-      <div class="grid grid-cols-3 gap-3">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
         @foreach($post->images as $img)
-          <img class="rounded border" src="{{ asset('storage/'.$img->path) }}" alt="image">
+          <img class="rounded border object-cover h-44 w-full" src="{{ asset('storage/'.$img->path) }}" alt="image">
         @endforeach
       </div>
     @endif
