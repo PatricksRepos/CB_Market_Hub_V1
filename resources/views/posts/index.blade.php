@@ -64,6 +64,9 @@
           @endif
 
           <div class="text-sm opacity-70 mt-2">
+            @if($post->marketplace_action)
+              {{ strtoupper($post->marketplace_action) }}
+            @endif
             @if($post->location) {{ $post->location }} @endif
             @if($post->price) • ${{ $post->price }} @endif
           </div>

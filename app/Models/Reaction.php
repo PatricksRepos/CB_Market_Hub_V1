@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Reaction extends Model
 {
-    public const ALLOWED_EMOJIS = ['👍', '❤️', '😂', '😮', '🎉'];
+    public const ALLOWED_EMOJIS = ['👍', '👎', '❤️', '😂', '😮', '🎉'];
 
     protected $fillable = [
         'user_id',

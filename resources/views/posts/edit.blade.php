@@ -37,9 +37,36 @@
                 <select name="type" class="border rounded w-full">
                     <option value="marketplace" @selected(old('type',$post->type)==='marketplace')>Marketplace</option>
                     <option value="business" @selected(old('type',$post->type)==='business')>Business / Service</option>
-                    
                 </select>
             </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label>Marketplace Action</label>
+                    <select name="marketplace_action" class="border rounded w-full">
+                        <option value="" @selected(old('marketplace_action', $post->marketplace_action) === null)>None</option>
+                        <option value="buy" @selected(old('marketplace_action', $post->marketplace_action) === 'buy')>Buy</option>
+                        <option value="sell" @selected(old('marketplace_action', $post->marketplace_action) === 'sell')>Sell</option>
+                        <option value="trade" @selected(old('marketplace_action', $post->marketplace_action) === 'trade')>Trade</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Price (optional)</label>
+                    <input name="price" type="number" step="0.01" min="0" value="{{ old('price', $post->price) }}" class="border rounded w-full">
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label>Location</label>
+                    <input name="location" class="border rounded w-full" value="{{ old('location', $post->location) }}">
+                </div>
+                <div>
+                    <label>Condition</label>
+                    <input name="condition" class="border rounded w-full" value="{{ old('condition', $post->condition) }}">
+                </div>
+            </div>
+
             <div><label>Title</label><input name="title" class="border rounded w-full" value="{{ old('title',$post->title) }}" required></div>
             <div><label>Body</label><textarea name="body" class="border rounded w-full" rows="6" required>{{ old('body',$post->body) }}</textarea></div>
             <div><label>Add images</label><input type="file" name="images[]" multiple accept="image/*"></div>
