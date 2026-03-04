@@ -16,7 +16,7 @@
 
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-5">
-            <div class="bg-white shadow-sm rounded-lg p-5">
+            <div class="bg-white shadow-sm rounded-lg p-5 space-y-4">
                 <form method="GET" action="{{ route('feed.index') }}" class="grid gap-3 sm:grid-cols-12 sm:items-end">
                     <div class="sm:col-span-6">
                         <label for="q" class="block text-xs uppercase tracking-wide text-gray-500">Search</label>
@@ -35,6 +35,23 @@
                         <a href="{{ route('feed.index') }}" class="inline-flex items-center rounded border px-3 py-2 text-sm hover:bg-gray-50">Reset</a>
                     </div>
                 </form>
+
+                <div class="flex flex-wrap gap-2">
+                    @foreach($availableTypes as $typeValue => $typeLabel)
+                        @php
+                            $count = $typeValue === 'all'
+                                ? (int) collect($typeCounts)->sum()
+                                : (int) ($typeCounts[$typeValue] ?? 0);
+                        @endphp
+                        <a
+                            href="{{ route('feed.index', array_filter(['type' => $typeValue, 'q' => $search !== '' ? $search : null])) }}"
+                            class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs {{ $selectedType === $typeValue ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50' }}"
+                        >
+                            <span>{{ $typeLabel }}</span>
+                            <span class="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold">{{ $count }}</span>
+                        </a>
+                    @endforeach
+                </div>
             </div>
 
             @forelse ($items as $item)
@@ -132,7 +149,11 @@
                     @endif
                 </div>
             @empty
-                <div class="bg-white shadow-sm rounded-lg p-5 text-gray-600">No activity matched your filters.</div>
+                <div class="bg-white shadow-sm rounded-lg p-6 text-center">
+                    <p class="text-gray-700 font-medium">No activity matched your filters.</p>
+                    <p class="text-sm text-gray-500 mt-1">Try clearing your search or switching to another feed type.</p>
+                    <a href="{{ route('feed.index') }}" class="inline-flex items-center rounded border px-3 py-1.5 mt-4 text-sm hover:bg-gray-50">Clear filters</a>
+                </div>
             @endforelse
         </div>
     </div>

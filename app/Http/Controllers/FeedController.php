@@ -12,6 +12,7 @@ use App\Models\Suggestion;
 use App\Support\Reactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class FeedController extends Controller
@@ -23,12 +24,16 @@ class FeedController extends Controller
         $search = trim((string) $request->string('q', ''));
         $selectedType = $this->normalizeFeedType((string) $request->string('type', 'all'));
 
-        $items = $this->collectFeedItems(Reactions::isEnabled())
+        $baseItems = $this->getBaseFeedItems(Reactions::isEnabled());
+
+        $items = $baseItems
             ->when($selectedType !== 'all', fn (Collection $collection) => $collection->where('type', $selectedType))
             ->when($search !== '', fn (Collection $collection) => $collection->filter(fn (array $item) => $this->matchesSearch($item, $search)))
             ->sortByDesc('at')
             ->take(40)
             ->values();
+
+        $typeCounts = $baseItems->countBy('type');
 
         return view('feed.index', [
             'items' => $items,
@@ -44,7 +49,15 @@ class FeedController extends Controller
                 'post_comment' => 'Post comments',
                 'poll_comment' => 'Poll comments',
             ],
+            'typeCounts' => $typeCounts,
         ]);
+    }
+
+    private function getBaseFeedItems(bool $includeReactions): Collection
+    {
+        $cacheKey = sprintf('feed:base:%s', $includeReactions ? 'with-reactions' : 'without-reactions');
+
+        return Cache::remember($cacheKey, now()->addSeconds(45), fn () => $this->collectFeedItems($includeReactions)->sortByDesc('at')->values());
     }
 
     private function collectFeedItems(bool $includeReactions): Collection
