@@ -1,63 +1,42 @@
 <x-app-layout>
   <x-slot name="header">
-    <div class="flex items-center justify-between gap-3">
-      <div>
-        <h2 class="font-semibold text-xl text-gray-800">Community Posts</h2>
-        <p class="text-sm text-gray-500">Browse updates, marketplace posts, and discussions from members.</p>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-2">
-        @auth
-          <a class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800" href="{{ route('posts.create') }}">Create Post</a>
-        @else
-          <a class="rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-gray-50" href="{{ route('login') }}">Log in to Post</a>
-        @endauth
-
-        @auth
-          <a class="rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-gray-50" href="{{ route('polls.create') }}">Start Discussion</a>
-        @else
-          <a class="rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-gray-50" href="{{ route('polls.index') }}">Browse Discussions</a>
-        @endauth
-
-        @auth
-          @if(auth()->user()->isAdmin())
-            <a class="rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-gray-50" href="/admin">Admin</a>
-          @endif
-        @endauth
-      </div>
-    </div>
+    <h2 class="font-semibold text-xl">Cape Breton Community Marketplace</h2>
   </x-slot>
 
   <div class="p-6 space-y-4">
-    <form method="GET" class="bg-white rounded-lg border p-4 flex flex-wrap gap-3 items-end">
-      <div>
-        <label class="block text-xs uppercase tracking-wide text-gray-500">Search</label>
-        <input name="q" value="{{ request('q') }}" placeholder="Search posts" class="mt-1 border rounded px-3 py-2">
-      </div>
+    <div class="flex items-center gap-4">
+      @auth
+        <a class="underline" href="{{ route('posts.create') }}">Create Post</a>
+      @else
+        <a class="underline" href="{{ route('login') }}">Login to Post</a>
+      @endauth
 
-      <div>
-        <label class="block text-xs uppercase tracking-wide text-gray-500">Category</label>
-        <select name="category" class="mt-1 border rounded px-3 py-2">
-          <option value="">All Categories</option>
-          @foreach($categories as $cat)
-            <option value="{{ $cat->id }}" @selected(request('category') == $cat->id)>{{ $cat->name }}</option>
-            @foreach($cat->children as $child)
-              <option value="{{ $child->id }}" @selected(request('category') == $child->id)>— {{ $child->name }}</option>
-            @endforeach
+      <a class="underline" href="{{ route('polls.index') }}">Discussions (Polls)</a>
+      <a class="underline" href="/admin">Admin</a>
+    </div>
+
+    <form method="GET" class="flex flex-wrap gap-2 items-center">
+      <input name="q" value="{{ request('q') }}" placeholder="Search posts" class="border rounded px-3 py-1">
+      <select name="category" class="border rounded">
+        <option value="">All Categories</option>
+        @foreach($categories as $cat)
+          <option value="{{ $cat->id }}" @selected(request('category') == $cat->id)>{{ $cat->name }}</option>
+          @foreach($cat->children as $child)
+            <option value="{{ $child->id }}" @selected(request('category') == $child->id)>— {{ $child->name }}</option>
           @endforeach
-        </select>
-      </div>
+        @endforeach
+      </select>
 
-      <button class="px-4 py-2 border rounded-lg text-sm font-semibold hover:bg-gray-50">Apply</button>
+      <button class="px-3 py-1 border rounded">Filter</button>
 
       @if(request('category') || request('q'))
-        <a class="px-4 py-2 border rounded-lg text-sm font-semibold hover:bg-gray-50" href="{{ route('posts.index') }}">Clear</a>
+        <a class="underline" href="{{ route('posts.index') }}">Clear</a>
       @endif
     </form>
 
-    <div class="space-y-4">
+    <div class="space-y-3">
       @forelse($posts as $post)
-        <div class="bg-white p-5 border rounded-lg shadow-sm">
+        <div class="p-4 border rounded">
           <div class="text-sm opacity-70">
             {{ $post->type }}
             @if($post->category)
@@ -76,7 +55,7 @@
             <span>• {{ $post->created_at->diffForHumans() }}</span>
           </div>
 
-          <a class="text-lg font-semibold hover:underline mt-2 inline-block" href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
+          <a class="text-lg underline mt-2 inline-block" href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
 
           @if($post->images->first())
             <a href="{{ route('posts.show', $post) }}" class="block mt-2">
