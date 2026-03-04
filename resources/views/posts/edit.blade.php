@@ -37,7 +37,7 @@
                 <select name="type" class="border rounded w-full">
                     <option value="marketplace" @selected(old('type',$post->type)==='marketplace')>Marketplace</option>
                     <option value="business" @selected(old('type',$post->type)==='business')>Business / Service</option>
-                    <option value="discussion" @selected(old('type',$post->type)==='discussion')>Discussion</option>
+                    
                 </select>
             </div>
             <div><label>Title</label><input name="title" class="border rounded w-full" value="{{ old('title',$post->title) }}" required></div>

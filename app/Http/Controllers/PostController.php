@@ -7,11 +7,14 @@ use App\Models\PostImage;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
     public function index(Request $request)
     {
+        $this->ensureDefaultCategories();
+
         $query = Post::query()
             ->where('is_hidden', false)
             ->with(['category.parent', 'user', 'images']);
@@ -20,24 +23,27 @@ class PostController extends Controller
             $query->where('category_id', $request->integer('category'));
         }
 
+        if ($request->filled('q')) {
+            $q = trim((string)$request->query('q'));
+            $query->where(function ($w) use ($q) {
+                $w->where('title', 'like', "%{$q}%")
+                    ->orWhere('body', 'like', "%{$q}%")
+                    ->orWhere('location', 'like', "%{$q}%");
+            });
+        }
+
         $posts = $query->latest()->paginate(20)->withQueryString();
 
-        $categories = Category::where('is_active', true)
-            ->whereNull('parent_id')
-            ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
-            ->orderBy('name')
-            ->get();
+        $categories = $this->loadCategoryTree();
 
         return view('posts.index', compact('posts', 'categories'));
     }
 
     public function create()
     {
-        $categories = Category::where('is_active', true)
-            ->whereNull('parent_id')
-            ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
-            ->orderBy('name')
-            ->get();
+        $this->ensureDefaultCategories();
+
+        $categories = $this->loadCategoryTree();
 
         return view('posts.create', compact('categories'));
     }
@@ -88,11 +94,9 @@ class PostController extends Controller
             403
         );
 
-        $categories = Category::where('is_active', true)
-            ->whereNull('parent_id')
-            ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
-            ->orderBy('name')
-            ->get();
+        $this->ensureDefaultCategories();
+
+        $categories = $this->loadCategoryTree();
 
         return view('posts.edit', compact('post', 'categories'));
     }
@@ -156,7 +160,7 @@ class PostController extends Controller
         return $request->validate([
             'category_id' => 'nullable|exists:categories,id',
             'subcategory_id' => 'nullable|exists:categories,id',
-            'type' => 'required|in:marketplace,business,discussion',
+            'type' => 'required|in:marketplace,business',
             'title' => 'required|string|max:180',
             'body' => 'required|string',
             'marketplace_action' => 'nullable|in:buy,sell,trade',
@@ -188,5 +192,51 @@ class PostController extends Controller
         }
 
         return $subcategory->id;
+    }
+
+    private function loadCategoryTree()
+    {
+        return Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
+            ->orderBy('name')
+            ->get();
+    }
+
+    private function ensureDefaultCategories(): void
+    {
+        if (Category::query()->exists()) {
+            return;
+        }
+
+        $defaults = [
+            'Buy & Sell' => ['Electronics', 'Furniture', 'Clothing'],
+            'Services' => ['Home Services', 'Beauty', 'Repairs'],
+            'Housing' => ['Rentals', 'Roommates'],
+            'Jobs' => ['Full-time', 'Part-time'],
+            'Community' => ['Announcements', 'Lost & Found'],
+        ];
+
+        $parentOrder = 0;
+        foreach ($defaults as $parentName => $children) {
+            $parent = Category::create([
+                'name' => $parentName,
+                'slug' => Str::slug($parentName),
+                'parent_id' => null,
+                'sort_order' => $parentOrder++,
+                'is_active' => true,
+            ]);
+
+            $childOrder = 0;
+            foreach ($children as $child) {
+                Category::create([
+                    'name' => $child,
+                    'slug' => Str::slug($parentName . ' ' . $child),
+                    'parent_id' => $parent->id,
+                    'sort_order' => $childOrder++,
+                    'is_active' => true,
+                ]);
+            }
+        }
     }
 }

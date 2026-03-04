@@ -5,6 +5,9 @@
 
     <div class="py-6">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            @if (session('status'))
+                <div class="mb-4 rounded border bg-green-50 p-3 text-green-800">{{ session('status') }}</div>
+            @endif
             <div class="bg-white rounded-lg border p-6">
                 @if ($errors->any())
                     <div class="mb-4 rounded border border-red-200 bg-red-50 p-4">
@@ -19,7 +22,7 @@
                     @csrf
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Title</label>
+                        <label class="block text-sm font-medium text-gray-700">Topic</label>
                         <input name="title" value="{{ old('title') }}" required class="mt-1 w-full rounded-lg border-gray-300" maxlength="140">
                     </div>
 
@@ -34,7 +37,7 @@
                     </label>
 
                     <button class="rounded-lg bg-gray-900 text-white px-5 py-2.5 font-semibold hover:bg-gray-800" type="submit">
-                        Post suggestion
+                        Post topic
                     </button>
                 </form>
             </div>

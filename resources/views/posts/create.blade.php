@@ -9,7 +9,8 @@
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white rounded-2xl border shadow-sm p-6 md:p-8">
-                <p class="text-sm text-gray-500 mb-6">Share with the community using a clean title, clear category, and optional photos.</p>
+                <p class="text-sm text-gray-500 mb-2">Share with the community using a clean title, clear category, and optional photos.</p>
+                <p class="text-sm text-blue-700 mb-6">Want to run a community discussion? Use <a class="underline font-semibold" href="{{ route('polls.create') }}">Polls</a> instead.</p>
 
                 @if($errors->any())
                     <div class="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
@@ -59,8 +60,7 @@
                             <label class="block text-sm font-medium text-gray-700">Post Type</label>
                             <select name="type" class="mt-1 w-full rounded-lg border-gray-300">
                                 <option value="marketplace" @selected(old('type')==='marketplace')>Marketplace</option>
-                                <option value="business" @selected(old('type')==='business')>Business / Service</option>
-                                <option value="discussion" @selected(old('type','discussion')==='discussion')>Discussion</option>
+                                <option value="business" @selected(old('type','business')==='business')>Business / Service</option>
                             </select>
                         </div>
                         <div>
