@@ -10,30 +10,42 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        $categories = [
-            'Buy & Sell',
-            'Services',
-            'Housing',
-            'Jobs',
-            'Vehicles',
-            'Community',
-            'Local Businesses',
-            'Events',
-            'Discussions',
+        $structure = [
+            'Buy & Sell' => ['Electronics', 'Furniture', 'Clothing', 'Home Goods'],
+            'Services' => ['Home Services', 'Beauty', 'Lessons', 'Repairs'],
+            'Housing' => ['Rentals', 'Roommates', 'Short-Term', 'For Sale'],
+            'Jobs' => ['Full-time', 'Part-time', 'Contract', 'Gig Work'],
+            'Vehicles' => ['Cars', 'Trucks', 'Motorcycles', 'Parts'],
+            'Community' => ['Announcements', 'Lost & Found', 'Volunteering'],
+            'Local Businesses' => ['Promotions', 'Openings', 'Collaborations'],
+            'Events' => ['Music', 'Sports', 'Family', 'Meetups'],
+            'Discussions' => ['General', 'Advice', 'Recommendations'],
         ];
 
-        foreach ($categories as $name) {
-            $slug = Str::slug($name);
-
-            Category::updateOrCreate(
-                ['slug' => $slug],
+        $parentOrder = 0;
+        foreach ($structure as $parentName => $children) {
+            $parent = Category::updateOrCreate(
+                ['slug' => Str::slug($parentName)],
                 [
-                    'name' => $name,
+                    'name' => $parentName,
                     'parent_id' => null,
-                    'sort_order' => 0,
+                    'sort_order' => $parentOrder++,
                     'is_active' => true,
                 ]
             );
+
+            $childOrder = 0;
+            foreach ($children as $childName) {
+                Category::updateOrCreate(
+                    ['slug' => Str::slug($parentName . ' ' . $childName)],
+                    [
+                        'name' => $childName,
+                        'parent_id' => $parent->id,
+                        'sort_order' => $childOrder++,
+                        'is_active' => true,
+                    ]
+                );
+            }
         }
     }
 }

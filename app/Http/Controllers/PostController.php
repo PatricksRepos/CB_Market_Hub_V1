@@ -14,7 +14,7 @@ class PostController extends Controller
     {
         $query = Post::query()
             ->where('is_hidden', false)
-            ->with(['category', 'user', 'images']);
+            ->with(['category.parent', 'user', 'images']);
 
         if ($request->filled('category')) {
             $query->where('category_id', $request->integer('category'));
@@ -22,32 +22,30 @@ class PostController extends Controller
 
         $posts = $query->latest()->paginate(20)->withQueryString();
 
-        $categories = Category::where('is_active', true)->orderBy('name')->get();
+        $categories = Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
+            ->orderBy('name')
+            ->get();
 
         return view('posts.index', compact('posts', 'categories'));
     }
 
     public function create()
     {
-        $categories = Category::where('is_active', true)->orderBy('name')->get();
+        $categories = Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
+            ->orderBy('name')
+            ->get();
+
         return view('posts.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'category_id' => 'nullable|exists:categories,id',
-            'type' => 'required|in:marketplace,business,discussion',
-            'title' => 'required|string|max:180',
-            'body' => 'required|string',
-            'marketplace_action' => 'nullable|in:buy,sell,trade',
-            'price' => 'nullable|numeric|min:0|max:9999999.99',
-            'location' => 'nullable|string|max:120',
-            'condition' => 'nullable|string|max:60',
-            'is_anonymous' => 'nullable|boolean',
-            'anonymous_name' => 'nullable|string|max:60',
-            'images.*' => 'nullable|image|max:8192',
-        ]);
+        $data = $this->validateData($request);
+        $data['category_id'] = $this->resolveCategoryId($data);
 
         $data['user_id'] = $request->user()->id;
         $data['is_anonymous'] = (bool)($data['is_anonymous'] ?? false);
@@ -77,7 +75,7 @@ class PostController extends Controller
     {
         abort_if($post->is_hidden, 404);
 
-        $post->load(['images', 'user', 'category']);
+        $post->load(['images', 'user', 'category.parent']);
 
         return view('posts.show', compact('post'));
     }
@@ -86,11 +84,15 @@ class PostController extends Controller
     {
         $user = request()->user();
         abort_unless(
-            $user->id === $post->user_id || $user->hasRole('admin') || $user->hasRole('moderator'),
+            $user->id === $post->user_id || $user->isAdmin(),
             403
         );
 
-        $categories = Category::where('is_active', true)->orderBy('name')->get();
+        $categories = Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
+            ->orderBy('name')
+            ->get();
 
         return view('posts.edit', compact('post', 'categories'));
     }
@@ -99,23 +101,12 @@ class PostController extends Controller
     {
         $user = $request->user();
         abort_unless(
-            $user->id === $post->user_id || $user->hasRole('admin') || $user->hasRole('moderator'),
+            $user->id === $post->user_id || $user->isAdmin(),
             403
         );
 
-        $data = $request->validate([
-            'category_id' => 'nullable|exists:categories,id',
-            'type' => 'required|in:marketplace,business,discussion',
-            'title' => 'required|string|max:180',
-            'body' => 'required|string',
-            'marketplace_action' => 'nullable|in:buy,sell,trade',
-            'price' => 'nullable|numeric|min:0|max:9999999.99',
-            'location' => 'nullable|string|max:120',
-            'condition' => 'nullable|string|max:60',
-            'is_anonymous' => 'nullable|boolean',
-            'anonymous_name' => 'nullable|string|max:60',
-            'images.*' => 'nullable|image|max:8192',
-        ]);
+        $data = $this->validateData($request);
+        $data['category_id'] = $this->resolveCategoryId($data);
 
         $data['is_anonymous'] = (bool)($data['is_anonymous'] ?? false);
 
@@ -145,7 +136,7 @@ class PostController extends Controller
     {
         $user = $request->user();
         abort_unless(
-            $user->id === $post->user_id || $user->hasRole('admin') || $user->hasRole('moderator'),
+            $user->id === $post->user_id || $user->isAdmin(),
             403
         );
 
@@ -158,5 +149,44 @@ class PostController extends Controller
         $post->delete();
 
         return redirect()->route('posts.index');
+    }
+
+    private function validateData(Request $request): array
+    {
+        return $request->validate([
+            'category_id' => 'nullable|exists:categories,id',
+            'subcategory_id' => 'nullable|exists:categories,id',
+            'type' => 'required|in:marketplace,business,discussion',
+            'title' => 'required|string|max:180',
+            'body' => 'required|string',
+            'marketplace_action' => 'nullable|in:buy,sell,trade',
+            'price' => 'nullable|numeric|min:0|max:9999999.99',
+            'location' => 'nullable|string|max:120',
+            'condition' => 'nullable|string|max:60',
+            'is_anonymous' => 'nullable|boolean',
+            'anonymous_name' => 'nullable|string|max:60',
+            'images.*' => 'nullable|image|max:8192',
+        ]);
+    }
+
+    private function resolveCategoryId(array $data): ?int
+    {
+        $categoryId = isset($data['category_id']) ? (int)$data['category_id'] : null;
+        $subcategoryId = isset($data['subcategory_id']) ? (int)$data['subcategory_id'] : null;
+
+        if (!$subcategoryId) {
+            return $categoryId ?: null;
+        }
+
+        $subcategory = Category::query()->whereKey($subcategoryId)->first();
+        if (!$subcategory || !$subcategory->parent_id) {
+            return $categoryId ?: null;
+        }
+
+        if ($categoryId && (int)$subcategory->parent_id !== $categoryId) {
+            return $categoryId;
+        }
+
+        return $subcategory->id;
     }
 }
