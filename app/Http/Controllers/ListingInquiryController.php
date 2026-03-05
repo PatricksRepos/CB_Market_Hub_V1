@@ -5,11 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Listing;
 use App\Models\ListingInquiry;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class ListingInquiryController extends Controller
 {
     public function index(Request $request)
     {
+        if (! $this->inquiryTablesExist()) {
+            return redirect()->route('listings.index')
+                ->with('status', 'Sales inquiries are not ready yet. Run: php artisan migrate');
+        }
+
         $user = $request->user();
 
         $inquiries = ListingInquiry::query()
@@ -25,6 +31,10 @@ class ListingInquiryController extends Controller
 
     public function start(Request $request, Listing $listing)
     {
+        if (! $this->inquiryTablesExist()) {
+            return back()->with('status', 'Sales inquiries are not ready yet. Run: php artisan migrate');
+        }
+
         $user = $request->user();
 
         abort_if($listing->user_id === $user->id, 422, 'You cannot inquire on your own listing.');
@@ -53,6 +63,11 @@ class ListingInquiryController extends Controller
 
     public function show(Request $request, ListingInquiry $inquiry)
     {
+        if (! $this->inquiryTablesExist()) {
+            return redirect()->route('listings.index')
+                ->with('status', 'Sales inquiries are not ready yet. Run: php artisan migrate');
+        }
+
         abort_unless($inquiry->involvesUser($request->user()->id), 403);
 
         $inquiry->load([
@@ -67,6 +82,10 @@ class ListingInquiryController extends Controller
 
     public function storeMessage(Request $request, ListingInquiry $inquiry)
     {
+        if (! $this->inquiryTablesExist()) {
+            return back()->with('status', 'Sales inquiries are not ready yet. Run: php artisan migrate');
+        }
+
         abort_unless($inquiry->involvesUser($request->user()->id), 403);
 
         $data = $request->validate([
@@ -81,5 +100,11 @@ class ListingInquiryController extends Controller
         $inquiry->forceFill(['last_message_at' => now()])->save();
 
         return redirect()->route('inquiries.show', $inquiry)->with('status', 'Message sent.');
+    }
+
+    private function inquiryTablesExist(): bool
+    {
+        return Schema::hasTable('listing_inquiries')
+            && Schema::hasTable('listing_inquiry_messages');
     }
 }
