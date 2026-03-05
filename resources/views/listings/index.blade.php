@@ -28,10 +28,10 @@
             </div>
 
             @forelse($listings as $l)
-                <a href="{{ route('listings.show',$l) }}" class="block bg-white rounded-lg border p-4 hover:bg-gray-50">
+                <div class="block bg-white rounded-lg border p-4">
                     <div class="flex items-start justify-between gap-3">
                         <div>
-                            <div class="font-semibold text-lg">{{ $l->title }}</div>
+                            <a href="{{ route('listings.show',$l) }}" class="font-semibold text-lg hover:underline">{{ $l->title }}</a>
                             <div class="text-sm text-gray-500 mt-1">
                                 {{ ucfirst($l->category) }}
                                 @if($l->location) • {{ $l->location }} @endif
@@ -47,7 +47,21 @@
                             @endif
                         </div>
                     </div>
-                </a>
+
+                    <div class="mt-3 flex flex-wrap items-center gap-2">
+                        <a href="{{ route('listings.show',$l) }}" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">View details</a>
+                        @auth
+                            @if(auth()->id() !== $l->user_id)
+                                <form method="POST" action="{{ route('contacts.start', $l) }}">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Contact Seller (Private)</button>
+                                </form>
+                            @endif
+                        @else
+                            <a href="{{ route('login') }}" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Log in to contact seller</a>
+                        @endauth
+                    </div>
+                </div>
             @empty
                 <div class="bg-white rounded-lg border p-6 text-gray-600">No direct listings yet.</div>
             @endforelse
