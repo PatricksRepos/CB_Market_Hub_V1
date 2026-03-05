@@ -9,6 +9,9 @@
                     <a href="{{ route('posts.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('posts.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Posts</a>
                     <a href="{{ route('polls.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('polls.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Polls</a>
                     <a href="{{ route('listings.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('listings.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Marketplace</a>
+                    @auth
+                        <a href="{{ route('inquiries.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('inquiries.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Inquiries</a>
+                    @endauth
                     <a href="{{ route('events.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Events</a>
                     <a href="{{ route('suggestions.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Suggestions</a>
                     <a href="{{ route('chat.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Chat</a>
@@ -63,6 +66,9 @@
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('suggestions.index') }}">Suggestions</a>
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('chat.index') }}">Chat</a>
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('listings.index') }}">Marketplace</a>
+            @auth
+                <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('inquiries.index') }}">Inquiries</a>
+            @endauth
             <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('events.index') }}">Events</a>
             @auth
                 @if(auth()->user()->isAdmin())
