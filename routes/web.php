@@ -45,6 +45,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/read', [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markOneRead'])->name('notifications.read-one');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
     Route::post('/chat/{message}/report', [\App\Http\Controllers\ChatController::class, 'report'])->middleware('throttle:chat-report')->name('chat.report');
 });
 

@@ -5,10 +5,10 @@
 
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-3">
-            @if (session('status'))
-                <div class="rounded border bg-green-50 p-3 text-green-800">{{ session('status') }}</div>
-            @endif
-
+            <div class="inline-flex rounded-lg border bg-white p-1">
+                <a href="{{ route('chat.index') }}" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Community Chat</a>
+                <a href="{{ route('contacts.index') }}" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white">Private Buyer/Seller Messages</a>
+            </div>
 
             <div class="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
                 Contacts are private threads between buyer and seller for a specific listing. For platform-wide discussion, use Community Chat.

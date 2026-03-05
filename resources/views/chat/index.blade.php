@@ -8,12 +8,15 @@
 
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-3">
-            @if (session('status'))
-                <div class="rounded border bg-yellow-50 p-3 text-yellow-900">{{ session('status') }}</div>
-            @endif
+            @auth
+                <div class="inline-flex rounded-lg border bg-white p-1">
+                    <a href="{{ route('chat.index') }}" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white">Community Chat</a>
+                    <a href="{{ route('contacts.index') }}" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Private Buyer/Seller Messages</a>
+                </div>
+            @endauth
 
             <div class="rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                This is an open platform chat. Do not share private contact or payment details here. Use marketplace <strong>Contacts</strong> for buyer/seller private messaging.
+                This is an open platform chat. Do not share private contact or payment details here. Buyer/seller communication stays in <strong>Private Buyer/Seller Messages</strong>.
             </div>
 
             <div class="bg-white rounded-lg border p-4">

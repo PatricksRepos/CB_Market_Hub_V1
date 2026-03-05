@@ -6,6 +6,13 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
+    public function unreadCount(Request $request)
+    {
+        return response()->json([
+            'unread_count' => $request->user()->unreadNotifications()->count(),
+        ]);
+    }
+
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
