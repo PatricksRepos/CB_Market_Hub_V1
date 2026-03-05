@@ -58,19 +58,19 @@
 
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t">
         <div class="pt-2 pb-3 space-y-1 px-4">
-            <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('feed.index') }}">Feed</a>
-            <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('posts.index') }}">Posts</a>
-            <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('polls.index') }}">Polls</a>
-            <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('suggestions.index') }}">Suggestions</a>
-            <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('chat.index') }}">Chat</a>
-            <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('listings.index') }}">Marketplace</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('feed.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('feed.index') }}">Feed</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('posts.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('posts.index') }}">Posts</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('polls.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('polls.index') }}">Polls</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('suggestions.index') }}">Suggestions</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('chat.index') }}">Chat</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('listings.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('listings.index') }}">Marketplace</a>
             @auth
-                <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('contacts.index') }}">Contacts</a>
+                <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('contacts.index') }}">Contacts</a>
             @endauth
-            <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('events.index') }}">Events</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('events.index') }}">Events</a>
             @auth
                 @if(auth()->user()->isAdmin())
-                    <a class="block px-3 py-2 rounded-lg hover:bg-gray-100" href="{{ route('moderation.index') }}">Moderation</a>
+                    <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('moderation.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('moderation.index') }}">Moderation</a>
                 @endif
             @endauth
         </div>

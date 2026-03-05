@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\PostImage;
 use App\Models\Category;
+use App\Models\Listing;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -85,7 +86,16 @@ class PostController extends Controller
 
         $post->load(array_filter(['images', 'user', 'category.parent', Reactions::isEnabled() ? 'reactions' : null]));
 
-        return view('posts.show', compact('post'));
+        $privateContactListing = null;
+        if ($post->marketplace_action && !$post->is_anonymous && $post->user_id) {
+            $privateContactListing = Listing::query()
+                ->where('user_id', $post->user_id)
+                ->where('is_active', true)
+                ->latest()
+                ->first();
+        }
+
+        return view('posts.show', compact('post', 'privateContactListing'));
     }
 
     public function edit(Post $post)
