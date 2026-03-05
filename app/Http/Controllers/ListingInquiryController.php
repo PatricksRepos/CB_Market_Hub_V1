@@ -39,7 +39,13 @@ class ListingInquiryController extends Controller
 
         $user = $request->user();
 
-        abort_if($listing->user_id === $user->id, 422, 'You cannot inquire on your own listing.');
+        if ((int) $listing->user_id === (int) $user->id) {
+            return back()->with('status', 'You cannot start a private contact thread on your own listing.');
+        }
+
+        if (! $listing->is_active || ! $listing->user_id) {
+            return back()->with('status', 'That listing is unavailable for private contact right now.');
+        }
 
         $inquiry = ListingInquiry::firstOrCreate(
             [
@@ -55,8 +61,9 @@ class ListingInquiryController extends Controller
             'body' => ['nullable', 'string', 'max:1500'],
         ]);
 
+        $initialMessage = trim((string) ($data['body'] ?? ''));
+
         if (! $inquiry->messages()->exists()) {
-            $initialMessage = trim((string) ($data['body'] ?? ''));
             $seedMessage = $inquiry->messages()->create([
                 'sender_user_id' => $user->id,
                 'body' => $initialMessage !== ''
@@ -74,6 +81,24 @@ class ListingInquiryController extends Controller
                 route('contacts.show', $inquiry),
                 $user->name.' sent: '.Str::limit($seedMessage->body, 80)
             ));
+        } elseif ($initialMessage !== '') {
+            $message = $inquiry->messages()->create([
+                'sender_user_id' => $user->id,
+                'body' => $initialMessage,
+            ]);
+
+            $inquiry->forceFill([
+                'last_message_at' => now(),
+                'buyer_last_read_at' => now(),
+            ])->save();
+
+            if ((int) $inquiry->seller_user_id !== (int) $user->id) {
+                $listing->user?->notify(new SimpleNotification(
+                    'New private contact message',
+                    route('contacts.show', $inquiry),
+                    $user->name.' sent: '.Str::limit($message->body, 80)
+                ));
+            }
         }
 
         return redirect()

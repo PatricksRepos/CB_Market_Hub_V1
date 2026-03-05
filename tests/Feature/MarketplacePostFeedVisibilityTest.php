@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Listing;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -93,6 +94,40 @@ class MarketplacePostFeedVisibilityTest extends TestCase
 
         $response->assertOk();
         $response->assertDontSeeText('Antenna Tuning Service');
+    }
+
+
+    public function test_marketplace_post_card_shows_private_message_button_when_seller_has_listing(): void
+    {
+        $seller = User::factory()->create();
+        $buyer = User::factory()->create();
+        $category = Category::query()->create([
+            'name' => 'Buy & Sell',
+            'slug' => Str::slug('Buy & Sell'),
+            'is_active' => true,
+        ]);
+
+        Listing::query()->create([
+            'user_id' => $seller->id,
+            'title' => 'Seller listing',
+            'category' => 'sell',
+            'is_active' => true,
+        ]);
+
+        Post::query()->create([
+            'user_id' => $seller->id,
+            'category_id' => $category->id,
+            'type' => 'marketplace',
+            'title' => 'Selling antenna from post',
+            'body' => 'Message me for details.',
+            'marketplace_action' => 'sell',
+            'is_anonymous' => false,
+        ]);
+
+        $response = $this->actingAs($buyer)->get(route('listings.index'));
+
+        $response->assertOk();
+        $response->assertSeeText('Message Seller (Private)');
     }
 
     public function test_invalid_marketplace_category_falls_back_to_default_filter(): void
