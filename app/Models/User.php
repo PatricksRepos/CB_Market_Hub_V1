@@ -49,4 +49,9 @@ class User extends Authenticatable
     public function suggestions() { return $this->hasMany(\App\Models\Suggestion::class); }
     public function suggestionVotes() { return $this->hasMany(\App\Models\SuggestionVote::class); }
     public function chatMessages() { return $this->hasMany(\App\Models\ChatMessage::class); }
+    public function listingInquiriesAsBuyer() { return $this->hasMany(\App\Models\ListingInquiry::class, 'buyer_user_id'); }
+    public function listingInquiriesAsSeller() { return $this->hasMany(\App\Models\ListingInquiry::class, 'seller_user_id'); }
+    public function listingInquiryMessages() { return $this->hasMany(\App\Models\ListingInquiryMessage::class, 'sender_user_id'); }
+
 }
+

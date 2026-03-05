@@ -22,4 +22,9 @@ class Listing extends Model
         return $this->morphMany(Reaction::class, 'reactable');
     }
 
+    public function inquiries()
+    {
+        return $this->hasMany(ListingInquiry::class);
+    }
+
 }
