@@ -17,9 +17,7 @@ class ChatController extends Controller
             ->reverse()
             ->values();
 
-        $prefillMessage = trim((string) $request->query('message', ''));
-
-        return view('chat.index', compact('messages', 'prefillMessage'));
+        return view('chat.index', compact('messages'));
     }
 
     public function fetch(Request $request)

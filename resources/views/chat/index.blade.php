@@ -75,7 +75,7 @@
                             @csrf
                             <input name="body" maxlength="500" required
                                    class="flex-1 rounded-lg border-gray-300"
-                                   value="{{ old('body', $prefillMessage ?? '') }}"
+                                   value="{{ old('body') }}"
                                    placeholder="Say something in the public room… (keep it chill)">
                             <button class="rounded-lg bg-gray-900 text-white px-4 py-2 hover:bg-gray-800" type="submit">
                                 Send
