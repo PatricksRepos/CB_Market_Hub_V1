@@ -73,10 +73,10 @@
                 </div>
 
                 @foreach($marketPosts as $post)
-                    <a href="{{ route('posts.show', $post) }}" class="block bg-white rounded-lg border p-4 hover:bg-gray-50">
+                    <div class="block bg-white rounded-lg border p-4">
                         <div class="flex items-center justify-between gap-3">
                             <div>
-                                <div class="font-semibold text-lg">{{ $post->title }}</div>
+                                <a href="{{ route('posts.show', $post) }}" class="font-semibold text-lg hover:underline">{{ $post->title }}</a>
                                 <div class="text-sm text-gray-500 mt-1">
                                     {{ strtoupper($post->marketplace_action ?? 'item') }}
                                     @if($post->location) • {{ $post->location }} @endif
@@ -90,7 +90,23 @@
                                 <img class="h-16 w-16 rounded border object-cover" src="{{ asset('storage/'.$post->images->first()->path) }}" alt="thumbnail">
                             @endif
                         </div>
-                    </a>
+
+                        <div class="mt-3 flex flex-wrap items-center gap-2">
+                            <a href="{{ route('posts.show', $post) }}" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">View post</a>
+                            @if(!$post->is_anonymous && !empty($marketPostContactListingIds[$post->id]))
+                                @auth
+                                    @if(auth()->id() !== $post->user_id)
+                                        <form method="POST" action="{{ route('contacts.start', $marketPostContactListingIds[$post->id]) }}">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Message Seller (Private)</button>
+                                        </form>
+                                    @endif
+                                @else
+                                    <a href="{{ route('login') }}" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Log in to message seller</a>
+                                @endauth
+                            @endif
+                        </div>
+                    </div>
                 @endforeach
             @endif
 
