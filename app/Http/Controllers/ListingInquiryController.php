@@ -51,13 +51,23 @@ class ListingInquiryController extends Controller
             ]
         );
 
+        $data = $request->validate([
+            'body' => ['nullable', 'string', 'max:1500'],
+        ]);
+
         if (! $inquiry->messages()->exists()) {
+            $initialMessage = trim((string) ($data['body'] ?? ''));
             $seedMessage = $inquiry->messages()->create([
                 'sender_user_id' => $user->id,
-                'body' => sprintf("Hi! I'm interested in your listing: %s", $listing->title),
+                'body' => $initialMessage !== ''
+                    ? $initialMessage
+                    : sprintf("Hi! I'm interested in your listing: %s", $listing->title),
             ]);
 
-            $inquiry->forceFill(['last_message_at' => now()])->save();
+            $inquiry->forceFill([
+                'last_message_at' => now(),
+                'buyer_last_read_at' => now(),
+            ])->save();
 
             $listing->user?->notify(new SimpleNotification(
                 'New private contact on your listing',
@@ -87,6 +97,8 @@ class ListingInquiryController extends Controller
             'messages' => fn ($query) => $query->with('sender')->oldest(),
         ]);
 
+        $this->markInquiryReadForUser($inquiry, (int) $request->user()->id);
+
         return view('inquiries.show', compact('inquiry'));
     }
 
@@ -107,7 +119,15 @@ class ListingInquiryController extends Controller
             'body' => $data['body'],
         ]);
 
-        $inquiry->forceFill(['last_message_at' => now()])->save();
+        $updates = ['last_message_at' => now()];
+
+        if ((int) $request->user()->id === (int) $inquiry->buyer_user_id) {
+            $updates['buyer_last_read_at'] = now();
+        } else {
+            $updates['seller_last_read_at'] = now();
+        }
+
+        $inquiry->forceFill($updates)->save();
 
         $recipient = (int) $request->user()->id === (int) $inquiry->buyer_user_id
             ? $inquiry->seller
@@ -150,7 +170,22 @@ class ListingInquiryController extends Controller
                 ];
             });
 
+        $this->markInquiryReadForUser($inquiry, (int) $request->user()->id);
+
         return response()->json(['messages' => $messages])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    }
+
+    private function markInquiryReadForUser(ListingInquiry $inquiry, int $userId): void
+    {
+        if ((int) $inquiry->buyer_user_id === $userId) {
+            $inquiry->forceFill(['buyer_last_read_at' => now()])->save();
+
+            return;
+        }
+
+        if ((int) $inquiry->seller_user_id === $userId) {
+            $inquiry->forceFill(['seller_last_read_at' => now()])->save();
+        }
     }
 
     private function inquiryTablesExist(): bool

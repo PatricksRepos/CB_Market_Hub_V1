@@ -19,11 +19,17 @@
                     $latest = $inquiry->messages->first();
                     $isBuyer = auth()->id() === $inquiry->buyer_user_id;
                     $counterparty = $isBuyer ? $inquiry->seller : $inquiry->buyer;
+                    $unreadCount = $inquiry->unreadMessagesCountFor((int) auth()->id());
                 @endphp
                 <a href="{{ route('contacts.show', $inquiry) }}" class="block bg-white rounded-lg border p-4 hover:bg-gray-50">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <div class="font-semibold">{{ $inquiry->listing?->title ?? 'Listing removed' }}</div>
+                            <div class="font-semibold flex items-center gap-2">
+                                <span>{{ $inquiry->listing?->title ?? 'Listing removed' }}</span>
+                                @if($unreadCount > 0)
+                                    <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">{{ $unreadCount }} new</span>
+                                @endif
+                            </div>
                             <div class="text-sm text-gray-600 mt-1">
                                 With {{ $counterparty?->name ?? 'User' }}
                                 @if($inquiry->listing)

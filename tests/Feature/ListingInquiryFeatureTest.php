@@ -37,6 +37,32 @@ class ListingInquiryFeatureTest extends TestCase
         $this->assertSame($buyer->id, $inquiry->buyer_user_id);
         $this->assertSame($seller->id, $inquiry->seller_user_id);
         $this->assertCount(1, $inquiry->messages);
+        $this->assertNotNull($inquiry->buyer_last_read_at);
+        $this->assertNull($inquiry->seller_last_read_at);
+    }
+
+    public function test_buyer_can_include_initial_message_when_starting_inquiry(): void
+    {
+        $seller = User::factory()->create();
+        $buyer = User::factory()->create();
+
+        $listing = Listing::query()->create([
+            'user_id' => $seller->id,
+            'title' => 'SWR Meter',
+            'category' => 'sell',
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($buyer)
+            ->post(route('contacts.start', $listing), [
+                'body' => 'Hi, can you share the age and condition?',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('listing_inquiry_messages', [
+            'sender_user_id' => $buyer->id,
+            'body' => 'Hi, can you share the age and condition?',
+        ]);
     }
 
     public function test_listing_owner_cannot_inquire_on_own_listing(): void
@@ -177,6 +203,37 @@ class ListingInquiryFeatureTest extends TestCase
             ->assertOk()
             ->assertJsonPath('messages.0.body', 'Can you ship this week?')
             ->assertJsonPath('messages.0.sender_user_id', $buyer->id);
+    }
+
+    public function test_opening_contact_thread_marks_messages_as_read_for_viewer(): void
+    {
+        $seller = User::factory()->create();
+        $buyer = User::factory()->create();
+
+        $listing = Listing::query()->create([
+            'user_id' => $seller->id,
+            'title' => 'Linear amplifier',
+            'category' => 'sell',
+            'is_active' => true,
+        ]);
+
+        $inquiry = ListingInquiry::query()->create([
+            'listing_id' => $listing->id,
+            'buyer_user_id' => $buyer->id,
+            'seller_user_id' => $seller->id,
+            'last_message_at' => now(),
+        ]);
+
+        $inquiry->messages()->create([
+            'sender_user_id' => $buyer->id,
+            'body' => 'Is this still available?',
+        ]);
+
+        $this->actingAs($seller)
+            ->get(route('contacts.show', $inquiry))
+            ->assertOk();
+
+        $this->assertNotNull($inquiry->fresh()->seller_last_read_at);
     }
 
 }
