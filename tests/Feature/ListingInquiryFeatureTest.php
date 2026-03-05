@@ -95,4 +95,57 @@ class ListingInquiryFeatureTest extends TestCase
             'body' => 'Still available.',
         ]);
     }
+
+
+    public function test_seller_gets_notification_when_buyer_starts_contact_thread(): void
+    {
+        $seller = User::factory()->create();
+        $buyer = User::factory()->create();
+
+        $listing = Listing::query()->create([
+            'user_id' => $seller->id,
+            'title' => 'Base station mic',
+            'category' => 'sell',
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($buyer)
+            ->post(route('contacts.start', $listing))
+            ->assertRedirect();
+
+        $seller->refresh();
+
+        $this->assertSame(1, $seller->notifications()->count());
+    }
+
+    public function test_other_participant_gets_notification_when_message_is_sent(): void
+    {
+        $seller = User::factory()->create();
+        $buyer = User::factory()->create();
+
+        $listing = Listing::query()->create([
+            'user_id' => $seller->id,
+            'title' => 'Mobile setup',
+            'category' => 'sell',
+            'is_active' => true,
+        ]);
+
+        $inquiry = ListingInquiry::query()->create([
+            'listing_id' => $listing->id,
+            'buyer_user_id' => $buyer->id,
+            'seller_user_id' => $seller->id,
+            'last_message_at' => now(),
+        ]);
+
+        $this->actingAs($buyer)
+            ->post(route('contacts.messages.store', $inquiry), ['body' => 'Still interested, is this available?'])
+            ->assertRedirect(route('contacts.show', $inquiry));
+
+        $seller->refresh();
+        $buyer->refresh();
+
+        $this->assertSame(1, $seller->notifications()->count());
+        $this->assertSame(0, $buyer->notifications()->count());
+    }
+
 }

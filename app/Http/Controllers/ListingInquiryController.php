@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Listing;
 use App\Models\ListingInquiry;
+use App\Notifications\SimpleNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class ListingInquiryController extends Controller
 {
@@ -50,12 +52,18 @@ class ListingInquiryController extends Controller
         );
 
         if (! $inquiry->messages()->exists()) {
-            $inquiry->messages()->create([
+            $seedMessage = $inquiry->messages()->create([
                 'sender_user_id' => $user->id,
                 'body' => sprintf("Hi! I'm interested in your listing: %s", $listing->title),
             ]);
 
             $inquiry->forceFill(['last_message_at' => now()])->save();
+
+            $listing->user?->notify(new SimpleNotification(
+                'New private contact on your listing',
+                route('contacts.show', $inquiry),
+                $user->name.' sent: '.Str::limit($seedMessage->body, 80)
+            ));
         }
 
         return redirect()
@@ -94,12 +102,24 @@ class ListingInquiryController extends Controller
             'body' => ['required', 'string', 'max:1500'],
         ]);
 
-        $inquiry->messages()->create([
+        $message = $inquiry->messages()->create([
             'sender_user_id' => $request->user()->id,
             'body' => $data['body'],
         ]);
 
         $inquiry->forceFill(['last_message_at' => now()])->save();
+
+        $recipient = (int) $request->user()->id === (int) $inquiry->buyer_user_id
+            ? $inquiry->seller
+            : $inquiry->buyer;
+
+        if ($recipient && (int) $recipient->id !== (int) $request->user()->id) {
+            $recipient->notify(new SimpleNotification(
+                'New private contact message',
+                route('contacts.show', $inquiry),
+                $request->user()->name.' sent: '.Str::limit($message->body, 80)
+            ));
+        }
 
         return redirect()->route('contacts.show', $inquiry)->with('status', 'Message sent.');
     }
