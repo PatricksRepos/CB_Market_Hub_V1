@@ -44,15 +44,23 @@
 
                 <x-reaction-bar :model="$listing" type="listing" />
 
+                <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
+                    <p class="font-medium">How messaging works</p>
+                    <p class="mt-1">Use <strong>Contact Seller</strong> for private buyer/seller deal details. Community Chat is public to the full platform.</p>
+                </div>
+
                 @auth
                     @if($listing->user && auth()->id() !== $listing->user_id)
-                        <form method="POST" action="{{ route('inquiries.start', $listing) }}" class="mt-4">
-                            @csrf
-                            <button type="submit" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Inquire with {{ $listing->user->name }}</button>
-                        </form>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <form method="POST" action="{{ route('inquiries.start', $listing) }}">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Contact Seller (Private)</button>
+                            </form>
+                            <a href="{{ route('chat.index') }}" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Open Community Chat (Public)</a>
+                        </div>
                     @endif
                 @else
-                    <a href="{{ route('login') }}" class="mt-4 inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Log in to inquire</a>
+                    <a href="{{ route('login') }}" class="mt-4 inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Log in to contact seller</a>
                 @endauth
 
                 @auth

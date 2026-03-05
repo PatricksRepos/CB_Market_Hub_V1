@@ -58,7 +58,9 @@ class ListingInquiryController extends Controller
             $inquiry->forceFill(['last_message_at' => now()])->save();
         }
 
-        return redirect()->route('inquiries.show', $inquiry);
+        return redirect()
+            ->route('inquiries.show', $inquiry)
+            ->with('status', 'Private contact thread ready. Keep marketplace deal details here.');
     }
 
     public function show(Request $request, ListingInquiry $inquiry)
@@ -74,7 +76,7 @@ class ListingInquiryController extends Controller
             'listing.user',
             'buyer',
             'seller',
-            'messages.sender',
+            'messages' => fn ($query) => $query->with('sender')->oldest(),
         ]);
 
         return view('inquiries.show', compact('inquiry'));

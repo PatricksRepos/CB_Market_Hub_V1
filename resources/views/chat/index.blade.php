@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between gap-3">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Community Chat</h2>
-            <div class="text-sm text-gray-500">Near-live (auto refresh)</div>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Community Chat (Public)</h2>
+            <div class="text-sm text-gray-500">Public room • visible to everyone (auto refresh)</div>
         </div>
     </x-slot>
 
@@ -11,6 +11,10 @@
             @if (session('status'))
                 <div class="rounded border bg-yellow-50 p-3 text-yellow-900">{{ session('status') }}</div>
             @endif
+
+            <div class="rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                This is an open platform chat. Do not share private contact or payment details here. Use marketplace <strong>Contacts</strong> for buyer/seller private messaging.
+            </div>
 
             <div class="bg-white rounded-lg border p-4">
                 <div id="chatBox" class="h-[60vh] overflow-y-auto space-y-2 pr-2">
@@ -44,6 +48,7 @@
                                     @auth
                                         <form method="POST" action="{{ route('chat.report',$m) }}">
                                             @csrf
+                                            <input type="hidden" name="reason" value="reported from community chat">
                                             <button class="text-xs text-gray-500 hover:underline" type="submit">Report</button>
                                         </form>
 
@@ -68,7 +73,7 @@
                             <input name="body" maxlength="500" required
                                    class="flex-1 rounded-lg border-gray-300"
                                    value="{{ old('body', $prefillMessage ?? '') }}"
-                                   placeholder="Say something… (keep it chill)">
+                                   placeholder="Say something in the public room… (keep it chill)">
                             <button class="rounded-lg bg-gray-900 text-white px-4 py-2 hover:bg-gray-800" type="submit">
                                 Send
                             </button>
@@ -78,7 +83,7 @@
                         </div>
                     @else
                         <div class="text-gray-600">
-                            <a class="underline" href="{{ route('login') }}">Log in</a> to chat.
+                            <a class="underline" href="{{ route('login') }}">Log in</a> to join public chat.
                         </div>
                     @endauth
                 </div>
