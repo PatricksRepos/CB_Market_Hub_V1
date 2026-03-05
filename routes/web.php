@@ -152,10 +152,18 @@ Route::delete('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionCont
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
-    Route::get('/inquiries', [ListingInquiryController::class, 'index'])->name('inquiries.index');
-    Route::post('/marketplace/{listing}/inquire', [ListingInquiryController::class, 'start'])->middleware('throttle:inquiries')->name('inquiries.start');
-    Route::get('/inquiries/{inquiry}', [ListingInquiryController::class, 'show'])->name('inquiries.show');
-    Route::post('/inquiries/{inquiry}/messages', [ListingInquiryController::class, 'storeMessage'])->middleware('throttle:inquiries')->name('inquiries.messages.store');
+    Route::get('/contacts', [ListingInquiryController::class, 'index'])->name('contacts.index');
+    Route::get('/inquiries', [ListingInquiryController::class, 'index'])->name('inquiries.index'); // backward-compatible alias
+
+    Route::post('/marketplace/{listing}/contact', [ListingInquiryController::class, 'start'])->middleware('throttle:inquiries')->name('contacts.start');
+    Route::post('/marketplace/{listing}/inquire', [ListingInquiryController::class, 'start'])->middleware('throttle:inquiries')->name('inquiries.start'); // backward-compatible alias
+
+    Route::get('/contacts/{inquiry}', [ListingInquiryController::class, 'show'])->name('contacts.show');
+    Route::get('/inquiries/{inquiry}', [ListingInquiryController::class, 'show'])->name('inquiries.show'); // backward-compatible alias
+
+    Route::get('/contacts/{inquiry}/messages', [ListingInquiryController::class, 'fetchMessages'])->middleware('throttle:contacts-fetch')->name('contacts.messages.fetch');
+    Route::post('/contacts/{inquiry}/messages', [ListingInquiryController::class, 'storeMessage'])->middleware('throttle:inquiries')->name('contacts.messages.store');
+    Route::post('/inquiries/{inquiry}/messages', [ListingInquiryController::class, 'storeMessage'])->middleware('throttle:inquiries')->name('inquiries.messages.store'); // backward-compatible alias
 });
 
 /*
