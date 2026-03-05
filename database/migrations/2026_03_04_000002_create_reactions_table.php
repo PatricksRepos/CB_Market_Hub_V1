@@ -11,12 +11,12 @@ return new class extends Migration
         Schema::create('reactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            // morphs() already creates an index on (reactable_type, reactable_id)
             $table->morphs('reactable');
             $table->string('emoji', 8);
             $table->timestamps();
 
             $table->unique(['user_id', 'reactable_type', 'reactable_id'], 'reactions_user_reactable_unique');
-            $table->index(['reactable_type', 'reactable_id']);
         });
     }
 
