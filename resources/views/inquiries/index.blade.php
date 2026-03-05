@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Sales Inquiries</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Private Contacts</h2>
     </x-slot>
 
     <div class="py-6">
@@ -8,6 +8,11 @@
             @if (session('status'))
                 <div class="rounded border bg-green-50 p-3 text-green-800">{{ session('status') }}</div>
             @endif
+
+
+            <div class="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
+                Contacts are private threads between buyer and seller for a specific listing. For platform-wide discussion, use Community Chat.
+            </div>
 
             @forelse($inquiries as $inquiry)
                 @php
@@ -37,7 +42,7 @@
                 </a>
             @empty
                 <div class="bg-white rounded-lg border p-6 text-gray-600">
-                    No inquiries yet. Open any marketplace listing and click <strong>Inquire</strong>.
+                    No contacts yet. Open any marketplace listing and click <strong>Contact Seller (Private)</strong>.
                 </div>
             @endforelse
 

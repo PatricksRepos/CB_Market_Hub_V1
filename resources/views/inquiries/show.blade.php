@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between gap-3">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Inquiry Thread</h2>
-            <a class="text-sm text-gray-600 hover:text-gray-900" href="{{ route('inquiries.index') }}">Back to inquiries</a>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Private Contact Thread</h2>
+            <a class="text-sm text-gray-600 hover:text-gray-900" href="{{ route('inquiries.index') }}">Back to contacts</a>
         </div>
     </x-slot>
 
@@ -18,8 +18,12 @@
                     Buyer: {{ $inquiry->buyer?->name ?? 'User' }} • Seller: {{ $inquiry->seller?->name ?? 'User' }}
                 </div>
                 @if($inquiry->listing)
-                    <a href="{{ route('listings.show', $inquiry->listing) }}" class="inline-flex mt-3 text-sm underline">View listing</a>
+                    <a href="{{ route('listings.show', $inquiry->listing) }}" class="inline-flex mt-3 text-sm underline">View listing details</a>
                 @endif
+            </div>
+
+            <div class="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
+                This thread is private between the buyer and seller for this listing. Community Chat is public and visible platform-wide.
             </div>
 
             <div class="bg-white rounded-lg border p-4 space-y-3 max-h-[60vh] overflow-y-auto">
@@ -39,7 +43,7 @@
             <form method="POST" action="{{ route('inquiries.messages.store', $inquiry) }}" class="bg-white rounded-lg border p-4 space-y-3">
                 @csrf
                 <label for="body" class="block text-sm font-medium text-gray-700">Reply</label>
-                <textarea id="body" name="body" rows="4" required maxlength="1500" class="w-full rounded-lg border-gray-300" placeholder="Type your message..."></textarea>
+                <textarea id="body" name="body" rows="4" required maxlength="1500" class="w-full rounded-lg border-gray-300" placeholder="Type your private buyer/seller message...">{{ old('body') }}</textarea>
                 @error('body')
                     <p class="text-sm text-red-600">{{ $message }}</p>
                 @enderror
