@@ -59,7 +59,7 @@ class ListingInquiryController extends Controller
         }
 
         return redirect()
-            ->route('inquiries.show', $inquiry)
+            ->route('contacts.show', $inquiry)
             ->with('status', 'Private contact thread ready. Keep marketplace deal details here.');
     }
 
@@ -101,7 +101,36 @@ class ListingInquiryController extends Controller
 
         $inquiry->forceFill(['last_message_at' => now()])->save();
 
-        return redirect()->route('inquiries.show', $inquiry)->with('status', 'Message sent.');
+        return redirect()->route('contacts.show', $inquiry)->with('status', 'Message sent.');
+    }
+
+
+    public function fetchMessages(Request $request, ListingInquiry $inquiry)
+    {
+        if (! $this->inquiryTablesExist()) {
+            return response()->json(['messages' => []]);
+        }
+
+        abort_unless($inquiry->involvesUser($request->user()->id), 403);
+
+        $afterId = (int) $request->query('after_id', 0);
+
+        $messages = $inquiry->messages()
+            ->where('id', '>', $afterId)
+            ->with('sender')
+            ->oldest()
+            ->get()
+            ->map(function ($message) {
+                return [
+                    'id' => $message->id,
+                    'sender_user_id' => $message->sender_user_id,
+                    'sender_name' => $message->sender?->name ?? 'User',
+                    'body' => $message->body,
+                    'created_at' => $message->created_at?->diffForHumans(),
+                ];
+            });
+
+        return response()->json(['messages' => $messages]);
     }
 
     private function inquiryTablesExist(): bool

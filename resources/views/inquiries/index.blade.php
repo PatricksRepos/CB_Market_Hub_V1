@@ -20,7 +20,7 @@
                     $isBuyer = auth()->id() === $inquiry->buyer_user_id;
                     $counterparty = $isBuyer ? $inquiry->seller : $inquiry->buyer;
                 @endphp
-                <a href="{{ route('inquiries.show', $inquiry) }}" class="block bg-white rounded-lg border p-4 hover:bg-gray-50">
+                <a href="{{ route('contacts.show', $inquiry) }}" class="block bg-white rounded-lg border p-4 hover:bg-gray-50">
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <div class="font-semibold">{{ $inquiry->listing?->title ?? 'Listing removed' }}</div>

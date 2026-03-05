@@ -52,7 +52,7 @@
                 @auth
                     @if($listing->user && auth()->id() !== $listing->user_id)
                         <div class="mt-4 flex flex-wrap gap-2">
-                            <form method="POST" action="{{ route('inquiries.start', $listing) }}">
+                            <form method="POST" action="{{ route('contacts.start', $listing) }}">
                                 @csrf
                                 <button type="submit" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Contact Seller (Private)</button>
                             </form>
