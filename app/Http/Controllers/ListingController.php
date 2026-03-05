@@ -45,7 +45,35 @@ class ListingController extends Controller
         $listings = $q->paginate(20)->withQueryString();
         $marketPosts = $postQuery->take(20)->get();
 
-        return view('listings.index', compact('listings', 'marketPosts', 'category'));
+        $marketPostContactListingIds = [];
+        $marketPostOwnerIds = $marketPosts
+            ->pluck('user_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($marketPostOwnerIds->isNotEmpty()) {
+            $listingIdsByOwner = Listing::query()
+                ->where('is_active', true)
+                ->whereIn('user_id', $marketPostOwnerIds)
+                ->latest('id')
+                ->get(['id', 'user_id'])
+                ->unique('user_id')
+                ->pluck('id', 'user_id');
+
+            foreach ($marketPosts as $post) {
+                if (! $post->user_id || $post->is_anonymous) {
+                    continue;
+                }
+
+                $contactListingId = $listingIdsByOwner->get($post->user_id);
+                if ($contactListingId) {
+                    $marketPostContactListingIds[$post->id] = (int) $contactListingId;
+                }
+            }
+        }
+
+        return view('listings.index', compact('listings', 'marketPosts', 'marketPostContactListingIds', 'category'));
     }
 
     public function show(Listing $listing)
