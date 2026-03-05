@@ -8,10 +8,10 @@
 
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-4">
-            @if (session('status'))
-                <div class="rounded border bg-green-50 p-3 text-green-800">{{ session('status') }}</div>
-            @endif
-
+            <div class="inline-flex rounded-lg border bg-white p-1">
+                <a href="{{ route('chat.index') }}" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">Community Chat</a>
+                <a href="{{ route('contacts.index') }}" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white">Private Buyer/Seller Messages</a>
+            </div>
             <div class="bg-white rounded-lg border p-4">
                 <div class="font-semibold text-lg">{{ $inquiry->listing?->title ?? 'Listing removed' }}</div>
                 <div class="text-sm text-gray-600 mt-1">

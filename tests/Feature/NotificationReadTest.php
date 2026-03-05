@@ -31,4 +31,18 @@ class NotificationReadTest extends TestCase
         $this->assertNotNull($targetNotification->read_at);
         $this->assertSame(1, $user->fresh()->unreadNotifications()->count());
     }
+    public function test_user_can_fetch_unread_notification_count(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $user->notify(new SimpleNotification('First', route('feed.index'), 'First message'));
+
+        $this->actingAs($user)
+            ->getJson(route('notifications.unread-count'))
+            ->assertOk()
+            ->assertJsonPath('unread_count', 1);
+    }
+
 }

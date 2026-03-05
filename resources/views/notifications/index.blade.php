@@ -11,10 +11,6 @@
 
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-3">
-            @if (session('status'))
-                <div class="rounded border bg-green-50 p-3 text-green-800">{{ session('status') }}</div>
-            @endif
-
             @forelse($notifications as $notification)
                 <div class="bg-white rounded-lg border p-4">
                     <div class="flex items-start justify-between gap-3">

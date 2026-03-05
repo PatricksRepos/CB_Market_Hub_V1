@@ -32,5 +32,90 @@
                 {{ $slot }}
             </main>
         </div>
+
+        @php
+            $toastMessage = session('status');
+            $toastType = session('error') || $errors->any() ? 'error' : ($toastMessage ? 'success' : null);
+            $toastBody = session('error') ?: ($errors->any() ? $errors->first() : $toastMessage);
+        @endphp
+
+        <div id="appToast"
+             class="fixed bottom-4 right-4 z-50 max-w-sm rounded-lg px-4 py-3 text-sm shadow-lg transition {{ $toastBody ? '' : 'hidden' }} {{ $toastType === 'error' ? 'bg-red-600 text-white' : 'bg-green-600 text-white' }}">
+            {{ $toastBody }}
+        </div>
+
+        @auth
+            <script>
+                (function () {
+                    const toast = document.getElementById('appToast');
+                    const badge = document.getElementById('navUnreadBadge');
+                    let unreadCount = Number(badge?.textContent || 0);
+
+                    function showToast(message, type = 'success') {
+                        if (!toast) return;
+                        toast.textContent = message;
+                        toast.classList.remove('hidden', 'bg-green-600', 'bg-red-600');
+                        toast.classList.add(type === 'error' ? 'bg-red-600' : 'bg-green-600');
+
+                        window.clearTimeout(window.__appToastTimer);
+                        window.__appToastTimer = window.setTimeout(() => {
+                            toast.classList.add('hidden');
+                        }, 3500);
+                    }
+
+                    if (toast && !toast.classList.contains('hidden')) {
+                        window.setTimeout(() => toast.classList.add('hidden'), 3500);
+                    }
+
+                    async function pollNotifications() {
+                        try {
+                            const response = await fetch("{{ route('notifications.unread-count') }}", {
+                                headers: { Accept: 'application/json' },
+                            });
+
+                            if (!response.ok) return;
+
+                            const data = await response.json();
+                            const nextCount = Number(data.unread_count || 0);
+
+                            if (badge) {
+                                badge.textContent = String(nextCount);
+                                badge.classList.toggle('hidden', nextCount < 1);
+                            }
+
+                            if (nextCount > unreadCount) {
+                                showToast('You have new notifications.', 'success');
+
+                                if ('Notification' in window && Notification.permission === 'granted') {
+                                    new Notification('CB Community', {
+                                        body: 'You have new notifications.',
+                                    });
+                                }
+                            }
+
+                            unreadCount = nextCount;
+                        } catch (error) {
+                            // ignore transient polling failures
+                        }
+                    }
+
+                    if ('Notification' in window && Notification.permission === 'default') {
+                        Notification.requestPermission().catch(() => {});
+                    }
+
+                    window.showAppToast = showToast;
+                    window.setInterval(pollNotifications, 15000);
+                })();
+            </script>
+        @else
+            <script>
+                (function () {
+                    const toast = document.getElementById('appToast');
+                    if (toast && !toast.classList.contains('hidden')) {
+                        window.setTimeout(() => toast.classList.add('hidden'), 3500);
+                    }
+                })();
+            </script>
+        @endauth
     </body>
 </html>

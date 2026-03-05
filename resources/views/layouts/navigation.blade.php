@@ -29,9 +29,7 @@
                         <a class="text-sm px-3 py-2 rounded-lg border hover:bg-gray-50" href="{{ route('notifications.index') }}">
                             Notifications
                             @php $u = auth()->user(); $c = $u?->unreadNotifications()?->count() ?? 0; @endphp
-                            @if ($c > 0)
-                                <span class="ml-2 text-xs bg-red-600 text-white rounded-full px-2 py-0.5">{{ $c }}</span>
-                            @endif
+                            <span id="navUnreadBadge" class="ml-2 text-xs bg-red-600 text-white rounded-full px-2 py-0.5 {{ $c > 0 ? '' : 'hidden' }}">{{ $c }}</span>
                         </a>
 
                         <a class="text-sm px-3 py-2 rounded-lg border hover:bg-gray-50" href="{{ route('profiles.edit') }}">Profile</a>

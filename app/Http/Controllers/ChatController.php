@@ -35,6 +35,7 @@ class ChatController extends Controller
             ->map(function (ChatMessage $message) {
                 return [
                     'id' => $message->id,
+                    'user_id' => $message->user_id,
                     'name' => $message->user?->name ?? 'User',
                     'body' => $message->body,
                     'is_deleted' => (bool) $message->is_deleted,

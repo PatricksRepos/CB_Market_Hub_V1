@@ -28,7 +28,8 @@ class ChatFeatureTest extends TestCase
         $this->getJson(route('chat.fetch', ['after_id' => 0]))
             ->assertOk()
             ->assertJsonPath('messages.0.body', 'Breaker breaker')
-            ->assertJsonPath('messages.0.name', $user->name);
+            ->assertJsonPath('messages.0.name', $user->name)
+            ->assertJsonPath('messages.0.user_id', $user->id);
     }
 
     public function test_user_cannot_delete_another_users_chat_message(): void
