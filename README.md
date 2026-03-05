@@ -8,6 +8,7 @@ CB Market Hub is a Laravel-based community platform for CB radio users. It combi
 - **Posts** with optional anonymous posting and image uploads
 - **Polls** with voting, comments, and visibility controls
 - **Marketplace** for buy/sell/trade listings
+- **Sales Inquiries (DM threads)** tied to marketplace listings
 - **Events** with image uploads and RSVP
 - **Suggestions** with voting and status updates
 - **Realtime-style Community Chat** (fetch + send flow)

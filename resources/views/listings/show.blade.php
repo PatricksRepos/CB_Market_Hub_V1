@@ -44,14 +44,16 @@
 
                 <x-reaction-bar :model="$listing" type="listing" />
 
-                @if($listing->user)
-                    <a
-                        href="{{ route('chat.index', ['message' => 'Hi '.$listing->user->name.', I\'m interested in your listing: '.$listing->title]) }}"
-                        class="mt-4 inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50"
-                    >
-                        Contact {{ $listing->user->name }}
-                    </a>
-                @endif
+                @auth
+                    @if($listing->user && auth()->id() !== $listing->user_id)
+                        <form method="POST" action="{{ route('inquiries.start', $listing) }}" class="mt-4">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Inquire with {{ $listing->user->name }}</button>
+                        </form>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}" class="mt-4 inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Log in to inquire</a>
+                @endauth
 
                 @auth
                     @if(auth()->id() === $listing->user_id || auth()->user()->isAdmin())

@@ -17,6 +17,7 @@ use App\Http\Controllers\ListingController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\ModerationController;
+use App\Http\Controllers\ListingInquiryController;
 
 Route::get('/', [FeedController::class, 'index'])->name('feed.index');
 
@@ -142,6 +143,20 @@ Route::get('/suggestions/{suggestion}/edit', [\App\Http\Controllers\SuggestionCo
 Route::put('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'update'])->middleware(['auth'])->name('suggestions.update');
 Route::delete('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'destroy'])->middleware(['auth'])->name('suggestions.destroy');
 
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Marketplace Inquiries (DMs tied to listings)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::get('/inquiries', [ListingInquiryController::class, 'index'])->name('inquiries.index');
+    Route::post('/marketplace/{listing}/inquire', [ListingInquiryController::class, 'start'])->middleware('throttle:inquiries')->name('inquiries.start');
+    Route::get('/inquiries/{inquiry}', [ListingInquiryController::class, 'show'])->name('inquiries.show');
+    Route::post('/inquiries/{inquiry}/messages', [ListingInquiryController::class, 'storeMessage'])->middleware('throttle:inquiries')->name('inquiries.messages.store');
+});
 
 /*
 |--------------------------------------------------------------------------
