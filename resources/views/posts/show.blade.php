@@ -28,12 +28,30 @@
     <x-reaction-bar :model="$post" type="post" />
 
     @if($post->marketplace_action && !$post->is_anonymous && $post->user)
-      <a
-        href="{{ route('chat.index', ['message' => 'Hi '.$post->user->name.', I\'m interested in your post: '.$post->title]) }}"
-        class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50"
-      >
-        Contact {{ $post->user->name }}
-      </a>
+      <div class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900 space-y-2">
+        <p>
+          Buying/selling deal messages are handled only in <strong>Private Buyer/Seller Messages</strong> from a marketplace listing.
+          Community Chat is separate and public.
+        </p>
+
+        @auth
+          @if(auth()->id() !== $post->user_id)
+            <div class="flex flex-wrap items-center gap-2">
+              @if(!empty($privateContactListing))
+                <form method="POST" action="{{ route('contacts.start', $privateContactListing) }}">
+                  @csrf
+                  <button type="submit" class="inline-flex items-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Contact Seller (Private)</button>
+                </form>
+                <a href="{{ route('listings.show', $privateContactListing) }}" class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 hover:bg-gray-50">View Listing</a>
+              @else
+                <a href="{{ route('listings.index') }}" class="inline-flex items-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Find Seller in Marketplace</a>
+              @endif
+            </div>
+          @endif
+        @else
+          <a href="{{ route('login') }}" class="inline-flex items-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Log in to Contact Seller</a>
+        @endauth
+      </div>
     @endif
 
     @if($post->images->count())
@@ -45,6 +63,7 @@
     @endif
 
     @auth
+      @if(auth()->id() === $post->user_id || auth()->user()->isAdmin())
       <div class="flex gap-3">
         <a class="underline" href="{{ route('posts.edit',$post) }}">Edit</a>
         <form method="POST" action="{{ route('posts.destroy',$post) }}">
@@ -52,6 +71,7 @@
           <button class="underline" onclick="return confirm('Hard delete this post?')">Delete</button>
         </form>
       </div>
+      @endif
 
       <hr>
 
