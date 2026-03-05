@@ -77,11 +77,19 @@ class ChatController extends Controller
 
     public function report(Request $request, ChatMessage $message)
     {
-        ChatReport::create([
-            'chat_message_id' => $message->id,
-            'user_id' => $request->user()->id,
-            'reason' => $request->input('reason'),
+        $data = $request->validate([
+            'reason' => ['nullable', 'string', 'max:500'],
         ]);
+
+        ChatReport::firstOrCreate(
+            [
+                'chat_message_id' => $message->id,
+                'user_id' => $request->user()->id,
+            ],
+            [
+                'reason' => $data['reason'] ?? null,
+            ]
+        );
 
         return back()->with('status', 'Message reported.');
     }

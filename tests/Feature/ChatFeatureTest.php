@@ -52,6 +52,29 @@ class ChatFeatureTest extends TestCase
         $this->assertSame('Owner message', $message->body);
     }
 
+
+    public function test_user_only_creates_one_report_per_chat_message(): void
+    {
+        $owner = User::factory()->create();
+        $reporter = User::factory()->create();
+
+        $message = ChatMessage::query()->create([
+            'user_id' => $owner->id,
+            'body' => 'Spam message',
+            'is_deleted' => false,
+        ]);
+
+        $this->actingAs($reporter)
+            ->post(route('chat.report', $message), ['reason' => 'spam'])
+            ->assertRedirect();
+
+        $this->actingAs($reporter)
+            ->post(route('chat.report', $message), ['reason' => 'spam again'])
+            ->assertRedirect();
+
+        $this->assertSame(1, ChatReport::query()->count());
+    }
+
     public function test_authenticated_user_can_report_chat_message(): void
     {
         $owner = User::factory()->create();
