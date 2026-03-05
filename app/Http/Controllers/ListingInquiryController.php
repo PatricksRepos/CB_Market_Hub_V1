@@ -128,7 +128,7 @@ class ListingInquiryController extends Controller
     public function fetchMessages(Request $request, ListingInquiry $inquiry)
     {
         if (! $this->inquiryTablesExist()) {
-            return response()->json(['messages' => []]);
+            return response()->json(['messages' => []])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
         }
 
         abort_unless($inquiry->involvesUser($request->user()->id), 403);
@@ -150,7 +150,7 @@ class ListingInquiryController extends Controller
                 ];
             });
 
-        return response()->json(['messages' => $messages]);
+        return response()->json(['messages' => $messages])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 
     private function inquiryTablesExist(): bool

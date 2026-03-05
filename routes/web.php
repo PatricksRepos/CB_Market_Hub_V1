@@ -161,7 +161,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/contacts/{inquiry}', [ListingInquiryController::class, 'show'])->name('contacts.show');
     Route::get('/inquiries/{inquiry}', [ListingInquiryController::class, 'show'])->name('inquiries.show'); // backward-compatible alias
 
-    Route::get('/contacts/{inquiry}/messages', [ListingInquiryController::class, 'fetchMessages'])->middleware('throttle:inquiries')->name('contacts.messages.fetch');
+    Route::get('/contacts/{inquiry}/messages', [ListingInquiryController::class, 'fetchMessages'])->middleware('throttle:contacts-fetch')->name('contacts.messages.fetch');
     Route::post('/contacts/{inquiry}/messages', [ListingInquiryController::class, 'storeMessage'])->middleware('throttle:inquiries')->name('contacts.messages.store');
     Route::post('/inquiries/{inquiry}/messages', [ListingInquiryController::class, 'storeMessage'])->middleware('throttle:inquiries')->name('inquiries.messages.store'); // backward-compatible alias
 });

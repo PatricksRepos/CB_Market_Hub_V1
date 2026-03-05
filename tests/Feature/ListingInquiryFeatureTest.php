@@ -148,4 +148,35 @@ class ListingInquiryFeatureTest extends TestCase
         $this->assertSame(0, $buyer->notifications()->count());
     }
 
+
+    public function test_seller_fetch_endpoint_receives_buyers_new_message(): void
+    {
+        $seller = User::factory()->create();
+        $buyer = User::factory()->create();
+
+        $listing = Listing::query()->create([
+            'user_id' => $seller->id,
+            'title' => 'Power mic',
+            'category' => 'sell',
+            'is_active' => true,
+        ]);
+
+        $inquiry = ListingInquiry::query()->create([
+            'listing_id' => $listing->id,
+            'buyer_user_id' => $buyer->id,
+            'seller_user_id' => $seller->id,
+            'last_message_at' => now(),
+        ]);
+
+        $this->actingAs($buyer)
+            ->post(route('contacts.messages.store', $inquiry), ['body' => 'Can you ship this week?'])
+            ->assertRedirect(route('contacts.show', $inquiry));
+
+        $this->actingAs($seller)
+            ->getJson(route('contacts.messages.fetch', $inquiry, false).'?after_id=0')
+            ->assertOk()
+            ->assertJsonPath('messages.0.body', 'Can you ship this week?')
+            ->assertJsonPath('messages.0.sender_user_id', $buyer->id);
+    }
+
 }
