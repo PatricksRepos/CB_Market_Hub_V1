@@ -28,12 +28,10 @@
     <x-reaction-bar :model="$post" type="post" />
 
     @if($post->marketplace_action && !$post->is_anonymous && $post->user)
-      <a
-        href="{{ route('chat.index', ['message' => 'Hi '.$post->user->name.', I\'m interested in your post: '.$post->title]) }}"
-        class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50"
-      >
-        Contact {{ $post->user->name }}
-      </a>
+      <div class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900">
+        Buying/selling deal messages are handled only in <strong>Private Buyer/Seller Messages</strong> from a marketplace listing.
+        Community Chat is separate and public.
+      </div>
     @endif
 
     @if($post->images->count())
