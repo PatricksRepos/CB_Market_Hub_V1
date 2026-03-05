@@ -27,7 +27,7 @@ class ListingInquiryFeatureTest extends TestCase
         ]);
 
         $this->actingAs($buyer)
-            ->post(route('inquiries.start', $listing))
+            ->post(route('contacts.start', $listing))
             ->assertRedirect();
 
         $inquiry = ListingInquiry::query()->first();
@@ -51,7 +51,7 @@ class ListingInquiryFeatureTest extends TestCase
         ]);
 
         $this->actingAs($seller)
-            ->post(route('inquiries.start', $listing))
+            ->post(route('contacts.start', $listing))
             ->assertStatus(422);
 
         $this->assertSame(0, ListingInquiry::query()->count());
@@ -78,16 +78,16 @@ class ListingInquiryFeatureTest extends TestCase
         ]);
 
         $this->actingAs($outsider)
-            ->get(route('inquiries.show', $inquiry))
+            ->get(route('contacts.show', $inquiry))
             ->assertForbidden();
 
         $this->actingAs($outsider)
-            ->post(route('inquiries.messages.store', $inquiry), ['body' => 'Can I jump in?'])
+            ->post(route('contacts.messages.store', $inquiry), ['body' => 'Can I jump in?'])
             ->assertForbidden();
 
         $this->actingAs($seller)
-            ->post(route('inquiries.messages.store', $inquiry), ['body' => 'Still available.'])
-            ->assertRedirect(route('inquiries.show', $inquiry));
+            ->post(route('contacts.messages.store', $inquiry), ['body' => 'Still available.'])
+            ->assertRedirect(route('contacts.show', $inquiry));
 
         $this->assertDatabaseHas('listing_inquiry_messages', [
             'listing_inquiry_id' => $inquiry->id,
