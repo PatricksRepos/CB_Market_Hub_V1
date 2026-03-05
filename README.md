@@ -93,6 +93,37 @@ php artisan test --filter=MarketplacePostFeedVisibilityTest
 - Some default Laravel files/components remain from the starter scaffold.
 - Public file uploads are expected on the `public` disk (`storage:link` as needed).
 
+
+## Production Readiness
+
+Before release, run through `docs/SHIP_READINESS_CHECKLIST.md` and keep environment values in a secure secret store.
+
+### Production environment template
+
+A hardened starter template is available at `.env.production.example`.
+
+```bash
+cp .env.production.example .env
+php artisan key:generate
+```
+
+Then set real credentials for DB/Redis/mail/storage before deployment.
+
+### Production deployment runbook
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm ci
+npm run build
+php artisan migrate --force
+php artisan storage:link
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+Queue workers should run continuously under a process manager (systemd/supervisor/container orchestration).
+
 ## Blade-First Optimization Roadmap
 
 The current app is optimized around Laravel + Blade, and that is the recommended direction for stability and speed of delivery.

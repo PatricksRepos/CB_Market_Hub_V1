@@ -44,7 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/read', [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markOneRead'])->name('notifications.read-one');
-    Route::post('/chat/{message}/report', [\App\Http\Controllers\ChatController::class, 'report'])->name('chat.report');
+    Route::post('/chat/{message}/report', [\App\Http\Controllers\ChatController::class, 'report'])->middleware('throttle:chat-report')->name('chat.report');
 });
 
 /*
@@ -63,12 +63,12 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
-    Route::post('/posts/{post}/comments', [PostCommentController::class, 'store'])->name('posts.comments.store');
-    Route::delete('/posts/{post}/comments/{comment}', [PostCommentController::class, 'destroy'])->name('posts.comments.destroy');
+    Route::post('/posts/{post}/comments', [PostCommentController::class, 'store'])->middleware('throttle:comments')->name('posts.comments.store');
+    Route::delete('/posts/{post}/comments/{comment}', [PostCommentController::class, 'destroy'])->middleware('throttle:comments')->name('posts.comments.destroy');
 
-    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+    Route::post('/reports', [ReportController::class, 'store'])->middleware('throttle:reports')->name('reports.store');
 
-    Route::post('/reactions', [ReactionController::class, 'store'])->name('reactions.store');
+    Route::post('/reactions', [ReactionController::class, 'store'])->middleware('throttle:reactions')->name('reactions.store');
 });
 
 /*
@@ -83,13 +83,13 @@ Route::get('/polls/{poll}', [PollController::class, 'show'])->name('polls.show')
 Route::middleware(['auth'])->group(function () {
     Route::post('/polls', [PollController::class, 'store'])->name('polls.store');
 
-    Route::post('/polls/{poll}/vote', [PollController::class, 'vote'])->name('polls.vote');
+    Route::post('/polls/{poll}/vote', [PollController::class, 'vote'])->middleware('throttle:votes')->name('polls.vote');
     Route::post('/polls/{poll}/end', [PollController::class, 'endEarly'])->name('polls.end');
     Route::patch('/polls/{poll}/visibility', [PollController::class, 'updateVisibility'])->name('polls.visibility');
     Route::delete('/polls/{poll}', [PollController::class, 'destroy'])->name('polls.destroy');
 
-    Route::post('/polls/{poll}/comments', [PollCommentController::class, 'store'])->name('polls.comments.store');
-    Route::delete('/polls/{poll}/comments/{comment}', [PollCommentController::class, 'destroy'])->name('polls.comments.destroy');
+    Route::post('/polls/{poll}/comments', [PollCommentController::class, 'store'])->middleware('throttle:comments')->name('polls.comments.store');
+    Route::delete('/polls/{poll}/comments/{comment}', [PollCommentController::class, 'destroy'])->middleware('throttle:comments')->name('polls.comments.destroy');
 });
 
 /*
@@ -134,9 +134,9 @@ Route::get('/suggestions', [\App\Http\Controllers\SuggestionController::class, '
 Route::get('/suggestions/create', [\App\Http\Controllers\SuggestionController::class, 'create'])->middleware(['auth'])->name('suggestions.create');
 Route::post('/suggestions', [\App\Http\Controllers\SuggestionController::class, 'store'])->middleware(['auth'])->name('suggestions.store');
 Route::get('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'show'])->name('suggestions.show');
-Route::post('/suggestions/{suggestion}/vote', [\App\Http\Controllers\SuggestionController::class, 'vote'])->middleware(['auth'])->name('suggestions.vote');
-Route::delete('/suggestions/{suggestion}/vote', [\App\Http\Controllers\SuggestionController::class, 'unvote'])->middleware(['auth'])->name('suggestions.unvote');
-Route::post('/suggestions/{suggestion}/report', [\App\Http\Controllers\SuggestionController::class, 'report'])->middleware(['auth'])->name('suggestions.report');
+Route::post('/suggestions/{suggestion}/vote', [\App\Http\Controllers\SuggestionController::class, 'vote'])->middleware(['auth', 'throttle:votes'])->name('suggestions.vote');
+Route::delete('/suggestions/{suggestion}/vote', [\App\Http\Controllers\SuggestionController::class, 'unvote'])->middleware(['auth', 'throttle:votes'])->name('suggestions.unvote');
+Route::post('/suggestions/{suggestion}/report', [\App\Http\Controllers\SuggestionController::class, 'report'])->middleware(['auth', 'throttle:reports'])->name('suggestions.report');
 Route::patch('/suggestions/{suggestion}/status', [\App\Http\Controllers\SuggestionController::class, 'setStatus'])->middleware(['auth'])->name('suggestions.status');
 Route::get('/suggestions/{suggestion}/edit', [\App\Http\Controllers\SuggestionController::class, 'edit'])->middleware(['auth'])->name('suggestions.edit');
 Route::put('/suggestions/{suggestion}', [\App\Http\Controllers\SuggestionController::class, 'update'])->middleware(['auth'])->name('suggestions.update');
@@ -161,7 +161,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 */
 
 Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
-Route::get('/chat/fetch', [\App\Http\Controllers\ChatController::class, 'fetch'])->name('chat.fetch');
-Route::post('/chat', [\App\Http\Controllers\ChatController::class, 'send'])->middleware(['auth'])->name('chat.send');
-Route::delete('/chat/{message}', [\App\Http\Controllers\ChatController::class, 'delete'])->middleware(['auth'])->name('chat.delete');
+Route::get('/chat/fetch', [\App\Http\Controllers\ChatController::class, 'fetch'])->middleware('throttle:chat-fetch')->name('chat.fetch');
+Route::post('/chat', [\App\Http\Controllers\ChatController::class, 'send'])->middleware(['auth', 'throttle:chat-send'])->name('chat.send');
+Route::delete('/chat/{message}', [\App\Http\Controllers\ChatController::class, 'delete'])->middleware(['auth', 'throttle:chat-send'])->name('chat.delete');
 require __DIR__.'/auth.php';
