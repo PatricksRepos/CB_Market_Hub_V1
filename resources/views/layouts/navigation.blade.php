@@ -10,7 +10,21 @@
                     <a href="{{ route('polls.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('polls.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Polls</a>
                     <a href="{{ route('listings.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('listings.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Marketplace</a>
                     @auth
-                        <a href="{{ route('contacts.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Contacts</a>
+                        @php
+                            $userId = (int) auth()->id();
+                            $contactUnreadCount = \\Illuminate\\Support\\Facades\\Schema::hasTable('listing_inquiries')
+                                ? \\App\\Models\\ListingInquiry::query()
+                                    ->forUser($userId)
+                                    ->get()
+                                    ->sum(fn ($inquiry) => $inquiry->unreadMessagesCountFor($userId))
+                                : 0;
+                        @endphp
+                        <a href="{{ route('contacts.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            Contacts
+                            @if($contactUnreadCount > 0)
+                                <span class="ml-1 text-xs bg-red-600 text-white rounded-full px-2 py-0.5">{{ $contactUnreadCount }}</span>
+                            @endif
+                        </a>
                     @endauth
                     <a href="{{ route('events.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Events</a>
                     <a href="{{ route('suggestions.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Suggestions</a>
@@ -65,7 +79,12 @@
             <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('chat.index') }}">Chat</a>
             <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('listings.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('listings.index') }}">Marketplace</a>
             @auth
-                <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('contacts.index') }}">Contacts</a>
+                <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('contacts.index') }}">
+                    Contacts
+                    @if(($contactUnreadCount ?? 0) > 0)
+                        <span class="ml-1 text-xs bg-red-600 text-white rounded-full px-2 py-0.5">{{ $contactUnreadCount }}</span>
+                    @endif
+                </a>
             @endauth
             <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('events.index') }}">Events</a>
             @auth

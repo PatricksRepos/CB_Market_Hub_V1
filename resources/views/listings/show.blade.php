@@ -51,9 +51,14 @@
 
                 @auth
                     @if($listing->user && auth()->id() !== $listing->user_id)
-                        <div class="mt-4 flex flex-wrap gap-2">
-                            <form method="POST" action="{{ route('contacts.start', $listing) }}">
+                        <div class="mt-4 space-y-3">
+                            <form method="POST" action="{{ route('contacts.start', $listing) }}" class="space-y-2 rounded-lg border p-3">
                                 @csrf
+                                <label for="contact-body" class="block text-sm font-medium text-gray-700">Message to seller</label>
+                                <textarea id="contact-body" name="body" rows="3" maxlength="1500" class="w-full rounded-lg border-gray-300" placeholder="Hi! Is this still available?">{{ old('body') }}</textarea>
+                                @error('body')
+                                    <p class="text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                                 <button type="submit" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Contact Seller (Private)</button>
                             </form>
                             <a href="{{ route('chat.index') }}" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Open Community Chat (Public)</a>

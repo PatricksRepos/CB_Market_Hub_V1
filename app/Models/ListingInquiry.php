@@ -11,10 +11,14 @@ class ListingInquiry extends Model
         'buyer_user_id',
         'seller_user_id',
         'last_message_at',
+        'buyer_last_read_at',
+        'seller_last_read_at',
     ];
 
     protected $casts = [
         'last_message_at' => 'datetime',
+        'buyer_last_read_at' => 'datetime',
+        'seller_last_read_at' => 'datetime',
     ];
 
     public function listing()
@@ -48,5 +52,17 @@ class ListingInquiry extends Model
     public function involvesUser(int $userId): bool
     {
         return $this->buyer_user_id === $userId || $this->seller_user_id === $userId;
+    }
+
+    public function unreadMessagesCountFor(int $userId): int
+    {
+        $lastReadAt = (int) $this->buyer_user_id === $userId
+            ? $this->buyer_last_read_at
+            : $this->seller_last_read_at;
+
+        return $this->messages()
+            ->where('sender_user_id', '!=', $userId)
+            ->when($lastReadAt, fn ($query) => $query->where('created_at', '>', $lastReadAt))
+            ->count();
     }
 }
