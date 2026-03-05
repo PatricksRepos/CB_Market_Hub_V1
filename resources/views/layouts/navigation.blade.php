@@ -12,8 +12,8 @@
                     @auth
                         @php
                             $userId = (int) auth()->id();
-                            $contactUnreadCount = \\Illuminate\\Support\\Facades\\Schema::hasTable('listing_inquiries')
-                                ? \\App\\Models\\ListingInquiry::query()
+                            $contactUnreadCount = \Illuminate\Support\Facades\Schema::hasTable('listing_inquiries')
+                                ? \App\Models\ListingInquiry::query()
                                     ->forUser($userId)
                                     ->get()
                                     ->sum(fn ($inquiry) => $inquiry->unreadMessagesCountFor($userId))
