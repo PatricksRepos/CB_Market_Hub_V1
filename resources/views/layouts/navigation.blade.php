@@ -1,14 +1,14 @@
-<nav x-data="{ open: false }" class="bg-white border-b" style="border-color: #c7d2fe;">
+<nav x-data="{ open: false }" class="border-b" style="background-color: var(--surface-bg); border-color: var(--surface-border);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex items-center gap-3">
-                <a href="{{ route('feed.index') }}" class="font-bold" style="color: #312e81;">CB Community Post</a>
+                <a href="{{ route('feed.index') }}" class="font-bold" style="color: var(--pill-active-text);">CB Community Post</a>
 
                 <div class="hidden sm:flex items-center gap-2">
-                    <a href="{{ route('feed.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('feed.*') ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Feed</a>
-                    <a href="{{ route('posts.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('posts.*') ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Posts</a>
-                    <a href="{{ route('polls.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('polls.*') ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Polls</a>
-                    <a href="{{ route('listings.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('listings.*') ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Marketplace</a>
+                    <a href="{{ route('feed.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('feed.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Feed</a>
+                    <a href="{{ route('posts.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('posts.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Posts</a>
+                    <a href="{{ route('polls.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('polls.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Polls</a>
+                    <a href="{{ route('listings.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('listings.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Marketplace</a>
                     @auth
                         @php
                             $userId = (int) auth()->id();
@@ -19,18 +19,18 @@
                                     ->sum(fn ($inquiry) => $inquiry->unreadMessagesCountFor($userId))
                                 : 0;
                         @endphp
-                        <a href="{{ route('contacts.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') || request()->routeIs('chat.*') ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">
+                        <a href="{{ route('contacts.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') || request()->routeIs('chat.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">
                             Connect
                             @if($contactUnreadCount > 0)
-                                <span class="ml-1 text-xs bg-red-600 text-white rounded-full px-2 py-0.5">{{ $contactUnreadCount }}</span>
+                                <span class="ml-1 text-xs bg-red-100 text-red-800 border border-red-200 rounded-full px-2 py-0.5">{{ $contactUnreadCount }}</span>
                             @endif
                         </a>
                     @endauth
-                    <a href="{{ route('events.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Events</a>
-                    <a href="{{ route('suggestions.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Suggestions</a>
+                    <a href="{{ route('events.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Events</a>
+                    <a href="{{ route('suggestions.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Suggestions</a>
                     @auth
                         @if(auth()->user()->isAdmin())
-                            <a href="{{ route('moderation.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('moderation.*') ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Moderation</a>
+                            <a href="{{ route('moderation.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('moderation.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Moderation</a>
                         @endif
                     @endauth
                 </div>
@@ -42,19 +42,26 @@
                         <a class="text-sm px-3 py-2 rounded-lg border text-indigo-700 hover:bg-indigo-50" href="{{ route('notifications.index') }}">
                             Notifications
                             @php $u = auth()->user(); $c = $u?->unreadNotifications()?->count() ?? 0; @endphp
-                            <span id="navUnreadBadge" class="ml-2 text-xs bg-red-600 text-white rounded-full px-2 py-0.5 {{ $c > 0 ? '' : 'hidden' }}">{{ $c }}</span>
+                            <span id="navUnreadBadge" class="ml-2 text-xs bg-red-100 text-red-800 border border-red-200 rounded-full px-2 py-0.5 {{ $c > 0 ? '' : 'hidden' }}">{{ $c }}</span>
                         </a>
 
                         <a class="text-sm px-3 py-2 rounded-lg border text-indigo-700 hover:bg-indigo-50" href="{{ route('profiles.show', auth()->user()) }}">{{ number_format((int) auth()->user()->points_total) }} pts</a>
 
                         <a class="text-sm px-3 py-2 rounded-lg border text-indigo-700 hover:bg-indigo-50" href="{{ route('profiles.edit') }}">Profile</a>
 
+                        <button type="button" onclick="toggleThemeMode()" class="text-sm px-3 py-2 rounded-lg border text-indigo-700 hover:bg-indigo-50">
+                            <span data-theme-toggle-label>Light mode</span>
+                        </button>
+
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button class="rounded-lg bg-indigo-600 text-white px-3 py-2 text-sm hover:bg-indigo-700" type="submit">Log out</button>
+                            <button class="rounded-lg bg-indigo-200 text-indigo-950 px-3 py-2 text-sm hover:bg-indigo-300" type="submit">Log out</button>
                         </form>
                     </div>
                 @else
+                    <button type="button" onclick="toggleThemeMode()" class="text-sm px-3 py-2 rounded-lg border text-indigo-700 hover:bg-indigo-50">
+                        <span data-theme-toggle-label>Light mode</span>
+                    </button>
                     <a href="{{ route('login') }}" class="text-sm text-indigo-700 hover:underline">Log in</a>
                     <a href="{{ route('register') }}" class="ms-4 text-sm text-indigo-700 hover:underline">Register</a>
                 @endauth
@@ -73,23 +80,27 @@
 
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t">
         <div class="pt-2 pb-3 space-y-1 px-4">
-            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('feed.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('feed.index') }}">Feed</a>
-            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('posts.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('posts.index') }}">Posts</a>
-            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('polls.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('polls.index') }}">Polls</a>
-            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('suggestions.index') }}">Suggestions</a>
-            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('listings.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('listings.index') }}">Marketplace</a>
+            <button type="button" onclick="toggleThemeMode()" class="block w-full text-left px-3 py-2 rounded-lg border text-indigo-700 hover:bg-indigo-50">
+                <span data-theme-toggle-label>Light mode</span>
+            </button>
+
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('feed.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('feed.index') }}">Feed</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('posts.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('posts.index') }}">Posts</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('polls.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('polls.index') }}">Polls</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('suggestions.index') }}">Suggestions</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('listings.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('listings.index') }}">Marketplace</a>
             @auth
-                <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') || request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('contacts.index') }}">
+                <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') || request()->routeIs('chat.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('contacts.index') }}">
                     Connect
                     @if(($contactUnreadCount ?? 0) > 0)
-                        <span class="ml-1 text-xs bg-red-600 text-white rounded-full px-2 py-0.5">{{ $contactUnreadCount }}</span>
+                        <span class="ml-1 text-xs bg-red-100 text-red-800 border border-red-200 rounded-full px-2 py-0.5">{{ $contactUnreadCount }}</span>
                     @endif
                 </a>
             @endauth
-            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('events.index') }}">Events</a>
+            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('events.index') }}">Events</a>
             @auth
                 @if(auth()->user()->isAdmin())
-                    <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('moderation.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('moderation.index') }}">Moderation</a>
+                    <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('moderation.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('moderation.index') }}">Moderation</a>
                 @endif
             @endauth
         </div>

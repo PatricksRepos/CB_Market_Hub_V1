@@ -1,12 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between gap-3">
-            <h2 class="font-semibold text-xl leading-tight" style="color: #312e81;">Community Feed</h2>
+            <h2 class="font-semibold text-xl leading-tight" style="color: var(--pill-active-text);">Community Feed</h2>
             <div class="flex items-center gap-2 text-sm">
                 @auth
-                    <a href="{{ route('posts.create') }}" class="rounded border px-3 py-1.5 text-white" style="background-color:#4f46e5;border-color:#4f46e5;">Add Post</a>
-                    <a href="{{ route('events.create') }}" class="rounded border px-3 py-1.5 text-white" style="background-color:#4f46e5;border-color:#4f46e5;">Add Event</a>
-                    <a href="{{ route('suggestions.create') }}" class="rounded border px-3 py-1.5 text-white" style="background-color:#4f46e5;border-color:#4f46e5;">Add Suggestion</a>
+                    <a href="{{ route('posts.create') }}" class="rounded border px-3 py-1.5 text-indigo-950" style="background-color:#c7d2fe;border-color:#a5b4fc;">Add Post</a>
+                    <a href="{{ route('events.create') }}" class="rounded border px-3 py-1.5 text-indigo-950" style="background-color:#c7d2fe;border-color:#a5b4fc;">Add Event</a>
+                    <a href="{{ route('suggestions.create') }}" class="rounded border px-3 py-1.5 text-indigo-950" style="background-color:#c7d2fe;border-color:#a5b4fc;">Add Suggestion</a>
                 @else
                     <a href="{{ route('login') }}" class="underline text-indigo-700">Log in to add post/event/suggestion</a>
                 @endauth
@@ -16,7 +16,7 @@
 
     <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-5">
-            <div class="bg-white shadow-sm rounded-lg p-5 space-y-4" style="border: 1px solid #c7d2fe;">
+            <div class="bg-white shadow-sm rounded-lg p-5 space-y-4" style="border: 1px solid var(--surface-border); background-color: var(--surface-bg);">
                 <form method="GET" action="{{ route('feed.index') }}" class="grid gap-3 sm:grid-cols-12 sm:items-end">
                     <div class="sm:col-span-6">
                         <label for="q" class="block text-xs uppercase tracking-wide text-gray-500">Search</label>
@@ -31,7 +31,7 @@
                         </select>
                     </div>
                     <div class="sm:col-span-2 flex gap-2">
-                        <button type="submit" class="inline-flex items-center rounded border px-3 py-2 text-sm text-white" style="background-color:#4f46e5;border-color:#4f46e5;">Apply</button>
+                        <button type="submit" class="inline-flex items-center rounded border px-3 py-2 text-sm text-indigo-950" style="background-color:#c7d2fe;border-color:#a5b4fc;">Apply</button>
                         <a href="{{ route('feed.index') }}" class="inline-flex items-center rounded border px-3 py-2 text-sm text-indigo-700 hover:bg-indigo-50" style="border-color:#a5b4fc;">Reset</a>
                     </div>
                 </form>
@@ -45,7 +45,7 @@
                         @endphp
                         <a
                             href="{{ route('feed.index', array_filter(['type' => $typeValue, 'q' => $search !== '' ? $search : null])) }}"
-                            class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs {{ $selectedType === $typeValue ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 text-gray-600 hover:bg-indigo-50 hover:text-indigo-700' }}"
+                            class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs {{ $selectedType === $typeValue ? 'border-indigo-300 bg-indigo-200 text-indigo-950' : 'border-gray-300 text-gray-600 hover:bg-indigo-50 hover:text-indigo-700' }}"
                         >
                             <span>{{ $typeLabel }}</span>
                             <span class="rounded-full px-2 py-0.5 text-[11px] font-semibold {{ $selectedType === $typeValue ? "bg-white text-indigo-700" : "bg-white text-gray-700" }}">{{ $count }}</span>
@@ -149,7 +149,7 @@
                     @endif
                 </div>
             @empty
-                <div class="bg-white shadow-sm rounded-lg p-6 text-center" style="border: 1px solid #c7d2fe;">
+                <div class="bg-white shadow-sm rounded-lg p-6 text-center" style="border: 1px solid var(--surface-border); background-color: var(--surface-bg);">
                     <p class="text-gray-700 font-medium">No activity matched your filters.</p>
                     <p class="text-sm text-gray-500 mt-1">Try clearing your search or switching to another feed type.</p>
                     <a href="{{ route('feed.index') }}" class="inline-flex items-center rounded border px-3 py-1.5 mt-4 text-sm text-indigo-700 hover:bg-indigo-50" style="border-color:#a5b4fc;">Clear filters</a>
