@@ -51,11 +51,7 @@
           </div>
 
           <div class="mt-2 flex items-center gap-2 text-sm text-gray-600">
-            @if($post->user?->avatar_url)
-              <img src="{{ $post->user->avatar_url }}" alt="{{ $post->user->name }} avatar" class="h-10 w-10 rounded-full object-cover border border-gray-200">
-            @else
-              <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xs font-semibold">{{ strtoupper(substr($post->user?->name ?? 'U',0,1)) }}</div>
-            @endif
+            <x-user-avatar :user="$post->user" :name="$post->user?->name ?? 'User'" size="h-10 w-10" class="border-gray-200" />
             <span>{{ $post->is_anonymous ? ($post->anonymous_name ?? 'Anon') : ($post->user?->name ?? 'User') }}</span>
             <span>• {{ $post->created_at->diffForHumans() }}</span>
           </div>

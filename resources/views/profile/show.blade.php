@@ -11,11 +11,7 @@
 
             <div class="bg-white rounded-xl border p-8">
                 <div class="text-center">
-                    @if($user->avatar_url)
-                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }} avatar" class="mx-auto h-24 w-24 rounded-full object-cover border">
-                    @else
-                        <div class="mx-auto h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-3xl font-semibold">{{ strtoupper(substr($user->name,0,1)) }}</div>
-                    @endif
+                    <x-user-avatar :user="$user" size="mx-auto h-24 w-24" class="border-gray-300" />
 
                     <div class="mt-4 text-2xl font-semibold">{{ $user->name }}</div>
                     @if($user->username)
