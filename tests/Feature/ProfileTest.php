@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -95,5 +97,34 @@ class ProfileTest extends TestCase
             ->assertRedirect('/profile');
 
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_avatar_route_serves_uploaded_profile_avatar(): void
+    {
+        Storage::fake('public');
+
+        $avatarPath = UploadedFile::fake()->image('avatar.jpg')->store('profile-avatars', 'public');
+
+        $user = User::factory()->create([
+            'avatar_url' => $avatarPath,
+        ]);
+
+        $response = $this->get(route('profiles.avatar', $user));
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'image/jpeg');
+    }
+
+    public function test_avatar_route_returns_not_found_for_missing_avatar(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create([
+            'avatar_url' => 'profile-avatars/missing.jpg',
+        ]);
+
+        $response = $this->get(route('profiles.avatar', $user));
+
+        $response->assertNotFound();
     }
 }
