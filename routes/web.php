@@ -30,6 +30,7 @@ Route::middleware(['auth','verified'])->get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/u/{user}', [ProfileController::class, 'show'])->name('profiles.show');
+Route::get('/u/{user}/avatar', [ProfileController::class, 'avatar'])->name('profiles.avatar');
 Route::middleware(['auth','verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profiles.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profiles.update');
