@@ -7,6 +7,7 @@ use App\Models\SuggestionVote;
 use App\Models\SuggestionReport;
 use Illuminate\Http\Request;
 use App\Support\Reactions;
+use App\Support\Gamification;
 
 class SuggestionController extends Controller
 {
@@ -60,6 +61,8 @@ class SuggestionController extends Controller
             'status' => 'open',
             'is_anonymous' => (bool)($data['is_anonymous'] ?? false),
         ]);
+
+        Gamification::award($request->user(), 'suggestion.created', 'suggestion:'.$s->id);
 
         return redirect()->route('suggestions.show', $s)->with('status','Suggestion posted.');
     }

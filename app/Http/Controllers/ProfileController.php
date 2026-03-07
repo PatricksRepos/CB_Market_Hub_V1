@@ -12,10 +12,13 @@ class ProfileController extends Controller
     public function show(User $user)
     {
         $user->loadCount(['posts','polls','listings','events']);
+        $user->load(['badges' => fn ($q) => $q->orderBy('points_required')]);
         $latestPosts = $user->posts()->latest()->take(5)->get();
         $latestPolls = $user->polls()->latest()->take(5)->get();
 
-        return view('profile.show', compact('user','latestPosts','latestPolls'));
+        $recentPointActivity = $user->pointTransactions()->latest()->take(10)->get();
+
+        return view('profile.show', compact('user','latestPosts','latestPolls', 'recentPointActivity'));
     }
 
     public function edit(Request $request)

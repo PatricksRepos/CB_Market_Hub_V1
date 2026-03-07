@@ -19,6 +19,8 @@ class User extends Authenticatable
         'username',
         'bio',
         'is_admin',
+        'points_total',
+        'current_badge_slug',
     ];
 
     protected $hidden = [
@@ -30,6 +32,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'is_admin' => 'boolean',
+        'points_total' => 'integer',
     ];
 
     public function isAdmin(): bool
@@ -52,6 +55,8 @@ class User extends Authenticatable
     public function listingInquiriesAsBuyer() { return $this->hasMany(\App\Models\ListingInquiry::class, 'buyer_user_id'); }
     public function listingInquiriesAsSeller() { return $this->hasMany(\App\Models\ListingInquiry::class, 'seller_user_id'); }
     public function listingInquiryMessages() { return $this->hasMany(\App\Models\ListingInquiryMessage::class, 'sender_user_id'); }
+    public function pointTransactions() { return $this->hasMany(\App\Models\PointTransaction::class); }
+    public function badges() { return $this->belongsToMany(\App\Models\Badge::class)->withPivot(['earned_at'])->withTimestamps(); }
 
 }
 

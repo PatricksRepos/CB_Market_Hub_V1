@@ -7,6 +7,7 @@ use App\Models\PostComment;
 use Illuminate\Http\Request;
 use App\Notifications\SimpleNotification;
 use Illuminate\Support\Str;
+use App\Support\Gamification;
 
 class PostCommentController extends Controller
 {
@@ -26,6 +27,8 @@ class PostCommentController extends Controller
             'user_id' => $request->user()->id,
             'body' => $data['body'],
         ]);
+
+        Gamification::award($request->user(), 'post.comment.created', 'post_comment:'.$comment->id);
 
         // notify post owner (if different)
         if ($post->user_id && (int)$post->user_id !== (int)$request->user()->id) {

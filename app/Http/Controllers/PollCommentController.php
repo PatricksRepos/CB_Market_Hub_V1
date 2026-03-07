@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Poll;
 use App\Models\PollComment;
 use Illuminate\Http\Request;
+use App\Support\Gamification;
 
 class PollCommentController extends Controller
 {
@@ -19,11 +20,13 @@ class PollCommentController extends Controller
             'body' => ['required','string','min:1','max:2000'],
         ]);
 
-        PollComment::create([
+        $comment = PollComment::create([
             'poll_id' => $poll->id,
             'user_id' => $request->user()->id,
             'body' => $data['body'],
         ]);
+
+        Gamification::award($request->user(), 'poll.comment.created', 'poll_comment:'.$comment->id);
 
         return back()->with('status', 'Comment posted.');
     }

@@ -7,6 +7,7 @@ use App\Models\PollOption;
 use App\Models\PollVote;
 use Illuminate\Http\Request;
 use App\Support\Reactions;
+use App\Support\Gamification;
 
 class PollController extends Controller
 {
@@ -91,6 +92,8 @@ class PollController extends Controller
             'results_visibility' => $data['results_visibility'],
         ]);
 
+        Gamification::award($request->user(), 'poll.created', 'poll:'.$poll->id);
+
         foreach ($options as $label) {
             PollOption::create(['poll_id' => $poll->id, 'label' => $label]);
         }
@@ -139,10 +142,14 @@ class PollController extends Controller
             return back()->withErrors(['poll_option_id' => 'Invalid option.']);
         }
 
-        PollVote::updateOrCreate(
+        $vote = PollVote::updateOrCreate(
             ['poll_id' => $poll->id, 'user_id' => $request->user()->id],
             ['poll_option_id' => $request->poll_option_id]
         );
+
+        if ($vote->wasRecentlyCreated) {
+            Gamification::award($request->user(), 'poll.vote.created', 'poll_vote:'.$poll->id);
+        }
 
         return back()->with('status', 'Vote saved.');
     }

@@ -56,7 +56,24 @@ Use this checklist as the pre-release gate for CB Market Hub.
 - [ ] Notifications mark single/read all.
 - [ ] Admin moderation status update flow.
 
-## 8) Rollback plan
+## 8) Gamification readiness
+
+- [ ] Run latest migrations to create points, badges, and point transaction tables.
+- [ ] Verify point awards for content creation flows (posts, comments, polls, listings, events, suggestions).
+- [ ] Verify reaction awards only grant points to content owners (not self-reactions).
+- [ ] Verify duplicate action submissions do not duplicate points (idempotency check).
+- [ ] Verify badge unlock notifications are delivered and profile badges render correctly.
+- [ ] Add abuse monitoring for point farming patterns (burst comments/reactions between same users).
+
+## 9) Production hardening before launch
+
+- [ ] Add a dedicated abuse/moderation playbook for spam and coordinated manipulation.
+- [ ] Define SLOs and on-call escalation policy for app/API and background jobs.
+- [ ] Add security headers and verify CSP policy for Blade pages.
+- [ ] Run a load test for peak concurrent chat/feed usage and validate DB indexes.
+- [ ] Add analytics dashboards for retention and engagement cohorts.
+
+## 10) Rollback plan
 
 - [ ] Define rollback trigger conditions.
 - [ ] Keep previous deploy artifact available.

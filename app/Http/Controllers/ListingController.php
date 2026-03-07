@@ -6,6 +6,7 @@ use App\Models\Listing;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use App\Support\Reactions;
+use App\Support\Gamification;
 
 class ListingController extends Controller
 {
@@ -100,6 +101,8 @@ class ListingController extends Controller
             'category' => $data['category'],
             'is_active' => true,
         ]);
+
+        Gamification::award($request->user(), 'listing.created', 'listing:'.$listing->id);
 
         return redirect()->route('listings.show', $listing)->with('status','Listing posted.');
     }

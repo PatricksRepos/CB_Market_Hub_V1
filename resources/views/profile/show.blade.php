@@ -32,6 +32,40 @@
                     <div class="rounded border p-3"><div class="text-gray-500">Listings</div><div class="font-semibold">{{ $user->listings_count }}</div></div>
                     <div class="rounded border p-3"><div class="text-gray-500">Events</div><div class="font-semibold">{{ $user->events_count }}</div></div>
                 </div>
+
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div class="rounded border p-3 bg-indigo-50 border-indigo-100">
+                        <div class="text-gray-600">Points</div>
+                        <div class="font-semibold text-lg">{{ number_format((int) $user->points_total) }}</div>
+                    </div>
+                    <div class="rounded border p-3 bg-amber-50 border-amber-100">
+                        <div class="text-gray-600">Current Badge</div>
+                        <div class="font-semibold text-lg">{{ $user->badges->last()?->name ?? 'Newcomer' }}</div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="text-sm text-gray-500 mb-2">Unlocked badges</div>
+                    <div class="flex flex-wrap gap-2">
+                        @forelse($user->badges as $badge)
+                            <span class="px-3 py-1 rounded-full border text-xs bg-gray-50" title="{{ $badge->description }}">{{ $badge->name }}</span>
+                        @empty
+                            <span class="text-sm text-gray-500">No badges yet.</span>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border p-6">
+                <h3 class="font-semibold mb-3">Recent points activity</h3>
+                @forelse($recentPointActivity as $activity)
+                    <div class="py-1 text-sm flex justify-between gap-3 border-b last:border-b-0">
+                        <span class="text-gray-700">{{ str_replace('.', ' ', $activity->action) }}</span>
+                        <span class="font-medium text-indigo-700">+{{ $activity->points }}</span>
+                    </div>
+                @empty
+                    <div class="text-gray-500">No activity yet.</div>
+                @endforelse
             </div>
 
             <div class="bg-white rounded-xl border p-6">
