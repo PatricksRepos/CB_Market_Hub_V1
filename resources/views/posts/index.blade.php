@@ -51,7 +51,7 @@
           </div>
 
           <div class="mt-2 flex items-center gap-2 text-sm text-gray-600">
-            <x-user-avatar :user="$post->user" :name="$post->user?->name ?? 'User'" size="h-10 w-10" class="border-gray-200" />
+            <x-user-avatar :user="$post->user" :name="$post->user?->name ?? 'User'" size="md" />
             <span>{{ $post->is_anonymous ? ($post->anonymous_name ?? 'Anon') : ($post->user?->name ?? 'User') }}</span>
             <span>• {{ $post->created_at->diffForHumans() }}</span>
           </div>

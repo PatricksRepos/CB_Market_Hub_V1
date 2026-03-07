@@ -11,7 +11,7 @@
 
             <div class="bg-white rounded-xl border p-8">
                 <div class="text-center">
-                    <x-user-avatar :user="$user" size="mx-auto h-24 w-24" class="border-gray-300" />
+                    <x-user-avatar :user="$user" size="xl" class="mx-auto" />
 
                     <div class="mt-4 text-2xl font-semibold">{{ $user->name }}</div>
                     @if($user->username)

@@ -4,7 +4,7 @@
   <div class="p-6 space-y-4">
     <div class="flex items-center gap-2 text-sm opacity-70">
       @if(!$post->is_anonymous)
-        <x-user-avatar :user="$post->user" :name="$post->user?->name ?? 'User'" size="h-16 w-16" class="border-gray-300" />
+        <x-user-avatar :user="$post->user" :name="$post->user?->name ?? 'User'" size="lg" />
       @endif
 
       @if($post->category)

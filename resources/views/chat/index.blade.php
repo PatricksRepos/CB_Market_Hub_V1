@@ -27,7 +27,7 @@
                         <div class="border rounded-lg p-2">
                             <div class="flex items-start justify-between gap-2">
                                 <div class="flex items-start gap-3">
-                                    <x-user-avatar :user="$m->user" :name="$m->user?->name ?? 'User'" size="h-16 w-16" class="border-gray-300" />
+                                    <x-user-avatar :user="$m->user" :name="$m->user?->name ?? 'User'" size="lg" />
 
                                     <div class="text-sm font-semibold text-gray-800">
                                         @if($m->is_deleted)

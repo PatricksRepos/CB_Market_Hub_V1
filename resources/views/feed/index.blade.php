@@ -60,7 +60,7 @@
                         <div class="text-xs text-gray-500">New post • {{ $item['at']->diffForHumans() }}</div>
                         <div class="mt-2 flex items-center gap-2 text-sm text-gray-600">
                             @php $postUser = $item['data']->user; @endphp
-                            <x-user-avatar :user="$postUser" :name="$postUser?->name ?? 'User'" size="h-16 w-16" class="border-gray-300" />
+                            <x-user-avatar :user="$postUser" :name="$postUser?->name ?? 'User'" size="lg" />
                             <span class="font-medium">{{ $item['data']->is_anonymous ? ($item['data']->anonymous_name ?? 'Anon') : ($postUser?->name ?? 'User') }}</span>
                         </div>
                         <div class="font-semibold text-lg mt-2">

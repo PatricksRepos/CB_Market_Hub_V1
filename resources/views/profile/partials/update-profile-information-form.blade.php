@@ -60,7 +60,7 @@
         <div>
             <x-input-label for="avatar_image" :value="__('Profile Picture Upload')" />
             <div class="mt-2">
-                <x-user-avatar :user="$user" size="h-16 w-16" class="border-gray-300" />
+                <x-user-avatar :user="$user" size="lg" />
             </div>
             <input id="avatar_image" name="avatar_image" type="file" accept="image/*" class="mt-2 block w-full text-sm text-gray-600" />
             <x-input-error class="mt-2" :messages="$errors->get('avatar_image')" />

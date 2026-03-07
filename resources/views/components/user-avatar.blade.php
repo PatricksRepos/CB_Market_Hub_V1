@@ -1,17 +1,26 @@
 @props([
     'user' => null,
     'name' => null,
-    'size' => 'h-10 w-10',
-    'class' => '',
+    'size' => 'md',
 ])
 
 @php
     $displayName = trim((string) ($name ?? $user?->name ?? 'User'));
     $initial = strtoupper(substr($displayName !== '' ? $displayName : 'U', 0, 1));
     $avatarUrl = $user?->avatar_url;
+
+    $sizeMap = [
+        'xs' => 28,
+        'sm' => 36,
+        'md' => 40,
+        'lg' => 64,
+        'xl' => 96,
+    ];
+
+    $avatarPixels = $sizeMap[$size] ?? $sizeMap['md'];
 @endphp
 
-<div class="{{ trim("relative inline-flex shrink-0 overflow-hidden rounded-full border {$size} {$class}") }}">
+<div {{ $attributes->class('relative inline-flex shrink-0 overflow-hidden rounded-full border border-gray-300') }} style="width: {{ $avatarPixels }}px; height: {{ $avatarPixels }}px;">
     @if($avatarUrl)
         <img
             src="{{ $avatarUrl }}"
