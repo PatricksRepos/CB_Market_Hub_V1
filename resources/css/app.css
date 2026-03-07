@@ -1,3 +1,89 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --brand-primary: #4f46e5;
+        --brand-secondary: #7c3aed;
+        --brand-accent: #14b8a6;
+
+        --app-bg-top: #f8fafc;
+        --app-bg-bottom: #eef2ff;
+        --surface-bg: #ffffff;
+        --surface-border: #c7d2fe;
+        --text-main: #0f172a;
+        --text-muted: #475569;
+        --pill-active-bg: #c7d2fe;
+        --pill-active-text: #312e81;
+    }
+
+    [data-theme='dark'] {
+        --brand-primary: #818cf8;
+        --brand-secondary: #a78bfa;
+        --brand-accent: #5eead4;
+
+        --app-bg-top: #0f172a;
+        --app-bg-bottom: #1e1b4b;
+        --surface-bg: #0b1220;
+        --surface-border: #334155;
+        --text-main: #e2e8f0;
+        --text-muted: #cbd5e1;
+        --pill-active-bg: #3730a3;
+        --pill-active-text: #e0e7ff;
+    }
+
+    body {
+        color: var(--text-main);
+        background: linear-gradient(180deg, var(--app-bg-top) 0%, var(--app-bg-bottom) 100%);
+    }
+
+
+    [data-theme='dark'] .bg-white {
+        background-color: var(--surface-bg) !important;
+    }
+
+    [data-theme='dark'] .bg-gray-100 {
+        background-color: #111827 !important;
+    }
+
+    [data-theme='dark'] .text-gray-500,
+    [data-theme='dark'] .text-gray-600,
+    [data-theme='dark'] .text-gray-700,
+    [data-theme='dark'] .text-gray-800,
+    [data-theme='dark'] .text-gray-900 {
+        color: var(--text-muted) !important;
+    }
+
+    [data-theme='dark'] .border-gray-100,
+    [data-theme='dark'] .border-gray-200,
+    [data-theme='dark'] .border-gray-300 {
+        border-color: var(--surface-border) !important;
+    }
+}
+
+@layer components {
+    .brand-card {
+        @apply rounded-xl border p-6 shadow-sm;
+        background-color: var(--surface-bg);
+        border-color: var(--surface-border);
+    }
+
+    .brand-btn {
+        @apply inline-flex items-center rounded-lg px-4 py-2 font-semibold transition;
+        background: linear-gradient(135deg, #c7d2fe, #ddd6fe);
+        color: #1e1b4b;
+        border: 1px solid #a5b4fc;
+    }
+
+    .brand-btn:hover {
+        filter: brightness(1.03);
+    }
+
+    .brand-text-gradient {
+        background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+}

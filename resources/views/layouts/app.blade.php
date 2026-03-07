@@ -14,13 +14,13 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+    <body class="font-sans antialiased" style="color: var(--text-main);">
+        <div class="min-h-screen">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white shadow">
+                <header class="shadow" style="background-color: var(--surface-bg); border-bottom: 1px solid var(--surface-border);">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -40,9 +40,36 @@
         @endphp
 
         <div id="appToast"
-             class="fixed bottom-4 right-4 z-50 max-w-sm rounded-lg px-4 py-3 text-sm shadow-lg transition {{ $toastBody ? '' : 'hidden' }} {{ $toastType === 'error' ? 'bg-red-600 text-white' : 'bg-green-600 text-white' }}">
+             class="fixed bottom-4 right-4 z-50 max-w-sm rounded-lg px-4 py-3 text-sm shadow-lg transition {{ $toastBody ? '' : 'hidden' }} {{ $toastType === 'error' ? 'bg-red-100 text-red-800 border border-red-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200' }}">
             {{ $toastBody }}
         </div>
+
+
+        <script>
+            (function () {
+                const savedTheme = localStorage.getItem('themePreference');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+
+                window.toggleThemeMode = function () {
+                    const current = document.documentElement.getAttribute('data-theme') || 'light';
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('themePreference', next);
+                    document.querySelectorAll('[data-theme-toggle-label]').forEach((el) => {
+                        el.textContent = next === 'dark' ? 'Light mode' : 'Dark mode';
+                    });
+                };
+
+                window.addEventListener('DOMContentLoaded', function () {
+                    const current = document.documentElement.getAttribute('data-theme') || 'light';
+                    document.querySelectorAll('[data-theme-toggle-label]').forEach((el) => {
+                        el.textContent = current === 'dark' ? 'Light mode' : 'Dark mode';
+                    });
+                });
+            })();
+        </script>
 
         @auth
             <script>
@@ -54,8 +81,10 @@
                     function showToast(message, type = 'success') {
                         if (!toast) return;
                         toast.textContent = message;
-                        toast.classList.remove('hidden', 'bg-green-600', 'bg-red-600');
-                        toast.classList.add(type === 'error' ? 'bg-red-600' : 'bg-green-600');
+                        toast.classList.remove('hidden', 'bg-emerald-100', 'bg-red-100', 'text-emerald-800', 'text-red-800', 'border-red-200', 'border-emerald-200');
+                        toast.classList.add(type === 'error' ? 'bg-red-100' : 'bg-emerald-100');
+                        toast.classList.add(type === 'error' ? 'text-red-800' : 'text-emerald-800');
+                        toast.classList.add(type === 'error' ? 'border-red-200' : 'border-emerald-200');
 
                         window.clearTimeout(window.__appToastTimer);
                         window.__appToastTimer = window.setTimeout(() => {

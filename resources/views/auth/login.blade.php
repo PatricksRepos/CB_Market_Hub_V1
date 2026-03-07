@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <div class="mb-6 text-center">
+        <h1 class="text-2xl font-bold brand-text-gradient">Welcome back</h1>
+        <p class="mt-1 text-sm text-gray-600">Sign in to continue to CB Market Hub.</p>
+    </div>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
