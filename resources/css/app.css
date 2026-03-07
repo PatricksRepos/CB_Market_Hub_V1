@@ -38,10 +38,6 @@
         background: linear-gradient(180deg, var(--app-bg-top) 0%, var(--app-bg-bottom) 100%);
     }
 
-    [x-cloak] {
-        display: none !important;
-    }
-
 
     [data-theme='dark'] .bg-white {
         background-color: var(--surface-bg) !important;
@@ -63,28 +59,6 @@
     [data-theme='dark'] .border-gray-200,
     [data-theme='dark'] .border-gray-300 {
         border-color: var(--surface-border) !important;
-    }
-}
-
-@media (max-width: 479px) {
-    .mobile-nav-content {
-        max-height: calc(100vh - 4rem);
-        overflow-y: auto;
-        padding-bottom: 1rem;
-    }
-}
-
-@media (min-width: 480px) and (max-width: 767px) {
-    .mobile-nav-content {
-        max-height: calc(100vh - 4.5rem);
-        overflow-y: auto;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-    .mobile-nav-content {
-        max-height: calc(100vh - 5rem);
-        overflow-y: auto;
     }
 }
 
