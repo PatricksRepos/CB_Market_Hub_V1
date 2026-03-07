@@ -153,6 +153,38 @@ class ListingInquiryFeatureTest extends TestCase
     }
 
 
+
+    public function test_starting_existing_thread_rewires_seller_to_current_listing_owner(): void
+    {
+        $originalSeller = User::factory()->create();
+        $newSeller = User::factory()->create();
+        $buyer = User::factory()->create();
+
+        $listing = Listing::query()->create([
+            'user_id' => $newSeller->id,
+            'title' => 'Coax cable bundle',
+            'category' => 'sell',
+            'is_active' => true,
+        ]);
+
+        ListingInquiry::query()->create([
+            'listing_id' => $listing->id,
+            'buyer_user_id' => $buyer->id,
+            'seller_user_id' => $originalSeller->id,
+            'last_message_at' => now(),
+        ]);
+
+        $this->actingAs($buyer)
+            ->post(route('contacts.start', $listing), ['body' => 'Checking in on availability.'])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('listing_inquiries', [
+            'listing_id' => $listing->id,
+            'buyer_user_id' => $buyer->id,
+            'seller_user_id' => $newSeller->id,
+        ]);
+    }
+
     public function test_only_inquiry_participants_can_view_and_message_thread(): void
     {
         $seller = User::factory()->create();
