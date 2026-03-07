@@ -11,6 +11,18 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+        <script>
+            (function () {
+                try {
+                    const savedTheme = localStorage.getItem('themePreference');
+                    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', savedTheme || systemTheme);
+                } catch (error) {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            })();
+        </script>
+
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
@@ -44,32 +56,6 @@
             {{ $toastBody }}
         </div>
 
-
-        <script>
-            (function () {
-                const savedTheme = localStorage.getItem('themePreference');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-theme', theme);
-
-                window.toggleThemeMode = function () {
-                    const current = document.documentElement.getAttribute('data-theme') || 'light';
-                    const next = current === 'dark' ? 'light' : 'dark';
-                    document.documentElement.setAttribute('data-theme', next);
-                    localStorage.setItem('themePreference', next);
-                    document.querySelectorAll('[data-theme-toggle-label]').forEach((el) => {
-                        el.textContent = next === 'dark' ? 'Light mode' : 'Dark mode';
-                    });
-                };
-
-                window.addEventListener('DOMContentLoaded', function () {
-                    const current = document.documentElement.getAttribute('data-theme') || 'light';
-                    document.querySelectorAll('[data-theme-toggle-label]').forEach((el) => {
-                        el.textContent = current === 'dark' ? 'Light mode' : 'Dark mode';
-                    });
-                });
-            })();
-        </script>
 
         @auth
             <script>
