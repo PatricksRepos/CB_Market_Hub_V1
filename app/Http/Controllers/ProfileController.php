@@ -43,12 +43,24 @@ class ProfileController extends Controller
         }
 
         if ($request->hasFile('avatar_image')) {
-            if ($user->avatar_url && str_starts_with($user->avatar_url, '/storage/profile-avatars/')) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $user->avatar_url));
+            $existingAvatar = (string) ($user->getRawOriginal('avatar_url') ?? '');
+
+            if ($existingAvatar !== '') {
+                $existingPath = $existingAvatar;
+
+                if (str_starts_with($existingPath, '/storage/')) {
+                    $existingPath = str_replace('/storage/', '', $existingPath);
+                } elseif (str_starts_with($existingPath, 'storage/')) {
+                    $existingPath = str_replace('storage/', '', $existingPath);
+                }
+
+                if (str_starts_with($existingPath, 'profile-avatars/')) {
+                    Storage::disk('public')->delete($existingPath);
+                }
             }
 
             $path = $request->file('avatar_image')->store('profile-avatars', 'public');
-            $data['avatar_url'] = Storage::url($path);
+            $data['avatar_url'] = $path;
         }
 
         unset($data['avatar_image']);

@@ -32,6 +32,7 @@ function getActiveTheme() {
 
 function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme;
 }
 
 function updateThemeToggleLabels() {
@@ -50,6 +51,15 @@ function initializeTheme() {
     applyTheme(initialTheme);
     updateThemeToggleLabels();
 }
+
+
+window.setThemeMode = function setThemeMode(theme) {
+    const normalized = theme === 'dark' ? 'dark' : 'light';
+
+    applyTheme(normalized);
+    storeTheme(normalized);
+    updateThemeToggleLabels();
+};
 
 window.toggleThemeMode = function toggleThemeMode() {
     const nextTheme = getActiveTheme() === 'dark' ? 'light' : 'dark';

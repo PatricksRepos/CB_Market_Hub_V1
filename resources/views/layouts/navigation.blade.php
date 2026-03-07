@@ -39,6 +39,16 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 @auth
                     <div class="flex items-center gap-3">
+                        <a href="{{ route('profiles.show', auth()->user()) }}" class="inline-flex items-center" title="Open profile">
+                            @if(auth()->user()?->avatar_url)
+                                <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }} avatar" class="h-9 w-9 rounded-full object-cover border" style="border-color: var(--surface-border);">
+                            @else
+                                <span class="h-9 w-9 rounded-full border inline-flex items-center justify-center text-sm font-semibold" style="border-color: var(--surface-border); color: var(--pill-active-text); background-color: var(--pill-active-bg);">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </span>
+                            @endif
+                        </a>
+
                         <a class="text-sm px-3 py-2 rounded-lg border text-indigo-700 hover:bg-indigo-50" href="{{ route('notifications.index') }}">
                             Notifications
                             @php $u = auth()->user(); $c = $u?->unreadNotifications()?->count() ?? 0; @endphp
