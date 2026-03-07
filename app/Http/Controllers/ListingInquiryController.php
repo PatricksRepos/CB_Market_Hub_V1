@@ -58,6 +58,10 @@ class ListingInquiryController extends Controller
             ]
         );
 
+        if ((int) $inquiry->seller_user_id !== (int) $listing->user_id) {
+            $inquiry->forceFill(['seller_user_id' => $listing->user_id])->save();
+        }
+
         $data = $request->validate([
             'body' => ['nullable', 'string', 'max:1500'],
         ]);

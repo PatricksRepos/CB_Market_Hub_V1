@@ -87,7 +87,7 @@
                                 showToast('You have new notifications.', 'success');
 
                                 if ('Notification' in window && Notification.permission === 'granted') {
-                                    new Notification('CB Community', {
+                                    new Notification('CB Community Post', {
                                         body: 'You have new notifications.',
                                     });
                                 }
