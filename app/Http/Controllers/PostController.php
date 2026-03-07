@@ -11,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Support\Reactions;
+use App\Support\Gamification;
 
 class PostController extends Controller
 {
@@ -64,6 +65,8 @@ class PostController extends Controller
         }
 
         $post = Post::create($data);
+
+        Gamification::award($request->user(), 'post.created', 'post:'.$post->id);
 
         if ($request->hasFile('images')) {
             $i = 0;

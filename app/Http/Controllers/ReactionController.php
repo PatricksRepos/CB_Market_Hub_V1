@@ -10,6 +10,7 @@ use App\Models\Post;
 use App\Models\Reaction;
 use App\Models\Suggestion;
 use App\Support\Reactions;
+use App\Support\Gamification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -59,10 +60,18 @@ class ReactionController extends Controller
             return back()->with('status', 'Reaction updated.');
         }
 
-        $reactable->reactions()->create([
+        $reaction = $reactable->reactions()->create([
             'user_id' => $request->user()->id,
             'emoji' => $data['emoji'],
         ]);
+
+        $ownerId = (int) ($reactable->getAttribute('user_id') ?? 0);
+        if ($ownerId > 0 && $ownerId !== (int) $request->user()->id && method_exists($reactable, 'user')) {
+            $owner = $reactable->user;
+            if ($owner) {
+                Gamification::award($owner, 'reaction.received', 'reaction_received:'.$reaction->id, ['from_user_id' => $request->user()->id]);
+            }
+        }
 
         return back()->with('status', 'Reaction saved.');
     }

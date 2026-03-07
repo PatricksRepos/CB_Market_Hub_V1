@@ -46,6 +46,8 @@
                             <span id="navUnreadBadge" class="ml-2 text-xs bg-red-600 text-white rounded-full px-2 py-0.5 {{ $c > 0 ? '' : 'hidden' }}">{{ $c }}</span>
                         </a>
 
+                        <a class="text-sm px-3 py-2 rounded-lg border hover:bg-gray-50" href="{{ route('profiles.show', auth()->user()) }}">{{ number_format((int) auth()->user()->points_total) }} pts</a>
+
                         <a class="text-sm px-3 py-2 rounded-lg border hover:bg-gray-50" href="{{ route('profiles.edit') }}">Profile</a>
 
                         <form method="POST" action="{{ route('logout') }}">

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use App\Support\Reactions;
+use App\Support\Gamification;
 
 class EventController extends Controller
 {
@@ -52,6 +53,8 @@ class EventController extends Controller
             'is_public' => true,
             'image_path' => $request->file('image')?->store('event-images', 'public'),
         ]);
+
+        Gamification::award($request->user(), 'event.created', 'event:'.$event->id);
 
         return redirect()->route('events.show', $event)->with('status', 'Event created.');
     }
