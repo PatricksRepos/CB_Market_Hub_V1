@@ -51,6 +51,10 @@ class User extends Authenticatable
             return '/'.$value;
         }
 
+        if (str_starts_with($value, 'profile-avatars/') && $this->exists) {
+            return route('profiles.avatar', ['user' => $this], false);
+        }
+
         return Storage::url($value);
     }
 

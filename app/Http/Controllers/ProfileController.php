@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
@@ -25,6 +26,17 @@ class ProfileController extends Controller
     {
         return view('profile.edit', ['user' => $request->user()]);
     }
+
+    public function avatar(User $user): StreamedResponse
+    {
+        $avatarPath = (string) ($user->getRawOriginal('avatar_url') ?? '');
+
+        abort_unless($avatarPath !== '' && str_starts_with($avatarPath, 'profile-avatars/'), 404);
+        abort_unless(Storage::disk('public')->exists($avatarPath), 404);
+
+        return Storage::disk('public')->response($avatarPath);
+    }
+
 
     public function update(Request $request)
     {

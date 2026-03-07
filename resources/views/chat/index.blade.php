@@ -27,11 +27,7 @@
                         <div class="border rounded-lg p-2">
                             <div class="flex items-start justify-between gap-2">
                                 <div class="flex items-start gap-3">
-                                    @if($m->user?->avatar_url)
-                                        <img src="{{ $m->user->avatar_url }}" alt="{{ $m->user?->name ?? 'User' }} avatar" class="h-16 w-16 rounded-full object-cover border">
-                                    @else
-                                        <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xl font-semibold">{{ strtoupper(substr($m->user?->name ?? 'U',0,1)) }}</div>
-                                    @endif
+                                    <x-user-avatar :user="$m->user" :name="$m->user?->name ?? 'User'" size="h-16 w-16" class="border-gray-300" />
 
                                     <div class="text-sm font-semibold text-gray-800">
                                         @if($m->is_deleted)
@@ -123,16 +119,27 @@
                         const leftWrap = document.createElement('div');
                         leftWrap.className = "flex items-start gap-3";
 
+                        const initial = (m.name || 'U').slice(0, 1).toUpperCase();
+                        const fallbackAvatar = () => {
+                            const fallback = document.createElement('div');
+                            fallback.className = "h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xl font-semibold border border-gray-300";
+                            fallback.textContent = initial;
+                            return fallback;
+                        };
+
                         let avatar;
                         if (m.avatar_url) {
                             avatar = document.createElement('img');
                             avatar.src = m.avatar_url;
                             avatar.alt = (m.name || 'User') + ' avatar';
-                            avatar.className = "h-16 w-16 rounded-full object-cover border";
+                            avatar.className = "h-16 w-16 rounded-full object-cover border border-gray-300";
+                            avatar.onerror = () => {
+                                if (avatar?.parentNode) {
+                                    avatar.parentNode.replaceChild(fallbackAvatar(), avatar);
+                                }
+                            };
                         } else {
-                            avatar = document.createElement('div');
-                            avatar.className = "h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xl font-semibold";
-                            avatar.textContent = (m.name || 'U').slice(0, 1).toUpperCase();
+                            avatar = fallbackAvatar();
                         }
 
                         const left = document.createElement('div');
