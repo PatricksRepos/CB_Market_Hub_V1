@@ -1,10 +1,10 @@
-<nav x-data="{ open: false }" class="border-b" style="background-color: var(--surface-bg); border-color: var(--surface-border);">
+<nav x-data="{ open: false }" class="sticky top-0 z-40 border-b" style="background-color: var(--surface-bg); border-color: var(--surface-border);">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-14">
-            <div class="flex items-center gap-2">
-                <a href="{{ route('feed.index') }}" class="font-semibold text-base whitespace-nowrap" style="color: var(--pill-active-text);">CB Community Post</a>
+        <div class="flex justify-between min-h-14 py-2 gap-3">
+            <div class="flex min-w-0 items-center gap-2 sm:gap-3">
+                <a href="{{ route('feed.index') }}" class="font-semibold text-sm sm:text-base whitespace-nowrap truncate" style="color: var(--pill-active-text);">CB Community Post</a>
 
-                <div class="hidden sm:flex items-center gap-1 text-sm">
+                <div class="hidden md:flex items-center gap-1 text-sm">
                     <a href="{{ route('feed.index') }}" class="px-2.5 py-1.5 rounded-md {{ request()->routeIs('feed.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Feed</a>
                     <a href="{{ route('posts.index') }}" class="px-2.5 py-1.5 rounded-md {{ request()->routeIs('posts.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Posts</a>
                     <a href="{{ route('polls.index') }}" class="px-2.5 py-1.5 rounded-md {{ request()->routeIs('polls.*') ? 'bg-indigo-200 text-indigo-950' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-700' }}">Polls</a>
@@ -36,7 +36,7 @@
                 </div>
             </div>
 
-            <div class="hidden sm:flex sm:items-center sm:ms-4">
+            <div class="hidden md:flex md:items-center md:ms-4 shrink-0">
                 @auth
                     <div class="flex items-center gap-2">
                         <a href="{{ route('profiles.show', auth()->user()) }}" class="inline-flex items-center" title="Open profile">
@@ -71,8 +71,14 @@
                 @endauth
             </div>
 
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-indigo-50">
+            <div class="-me-1 flex items-center md:hidden shrink-0">
+                <button
+                    type="button"
+                    @click="open = ! open"
+                    :aria-expanded="open.toString()"
+                    aria-controls="mobile-nav-panel"
+                    class="inline-flex items-center justify-center p-2.5 rounded-md text-gray-700 hover:bg-indigo-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                >
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -82,8 +88,20 @@
         </div>
     </div>
 
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t">
-        <div class="pt-2 pb-3 space-y-1 px-4">
+    <div
+        id="mobile-nav-panel"
+        x-cloak
+        x-show="open"
+        x-transition:enter="transition ease-out duration-150"
+        x-transition:enter-start="opacity-0 -translate-y-1"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-100"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 -translate-y-1"
+        class="md:hidden border-t"
+        @click.outside="open = false"
+    >
+        <div class="pt-2 pb-3 space-y-1.5 px-4 mobile-nav-content">
             <button type="button" onclick="toggleThemeMode()" class="block w-full text-left px-2.5 py-1.5 rounded-md border text-indigo-700 hover:bg-indigo-50">
                 <span data-theme-toggle-label>Light mode</span>
             </button>
@@ -94,6 +112,9 @@
             <a class="block px-2.5 py-1.5 rounded-md {{ request()->routeIs('suggestions.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('suggestions.index') }}">Suggestions</a>
             <a class="block px-2.5 py-1.5 rounded-md {{ request()->routeIs('listings.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('listings.index') }}">Marketplace</a>
             @auth
+                <a class="block px-2.5 py-1.5 rounded-md {{ request()->routeIs('notifications.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('notifications.index') }}">Notifications</a>
+                <a class="block px-2.5 py-1.5 rounded-md {{ request()->routeIs('profiles.show') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('profiles.show', auth()->user()) }}">My Profile</a>
+                <a class="block px-2.5 py-1.5 rounded-md {{ request()->routeIs('profiles.edit') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('profiles.edit') }}">Edit Profile</a>
                 <a class="block px-2.5 py-1.5 rounded-md {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') || request()->routeIs('chat.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('contacts.index') }}">
                     Connect
                     @if(($contactUnreadCount ?? 0) > 0)
@@ -106,6 +127,14 @@
                 @if(auth()->user()->isAdmin())
                     <a class="block px-2.5 py-1.5 rounded-md {{ request()->routeIs('moderation.*') ? 'bg-indigo-200 text-indigo-950' : 'hover:bg-indigo-50 text-gray-700' }}" href="{{ route('moderation.index') }}">Moderation</a>
                 @endif
+
+                <form method="POST" action="{{ route('logout') }}" class="pt-2">
+                    @csrf
+                    <button class="w-full rounded-md bg-indigo-200 text-indigo-950 px-2.5 py-2 text-sm hover:bg-indigo-300" type="submit">Log out</button>
+                </form>
+            @else
+                <a class="block px-2.5 py-1.5 rounded-md hover:bg-indigo-50 text-gray-700" href="{{ route('login') }}">Log in</a>
+                <a class="block px-2.5 py-1.5 rounded-md hover:bg-indigo-50 text-gray-700" href="{{ route('register') }}">Register</a>
             @endauth
         </div>
     </div>
