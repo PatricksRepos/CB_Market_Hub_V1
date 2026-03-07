@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex items-center gap-3">
-                <a href="{{ route('feed.index') }}" class="font-bold text-gray-900">CB Community</a>
+                <a href="{{ route('feed.index') }}" class="font-bold text-gray-900">CB Community Post</a>
 
                 <div class="hidden sm:flex items-center gap-2">
                     <a href="{{ route('feed.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('feed.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Feed</a>
@@ -19,8 +19,8 @@
                                     ->sum(fn ($inquiry) => $inquiry->unreadMessagesCountFor($userId))
                                 : 0;
                         @endphp
-                        <a href="{{ route('contacts.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                            Contacts
+                        <a href="{{ route('contacts.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') || request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                            Connect
                             @if($contactUnreadCount > 0)
                                 <span class="ml-1 text-xs bg-red-600 text-white rounded-full px-2 py-0.5">{{ $contactUnreadCount }}</span>
                             @endif
@@ -28,7 +28,6 @@
                     @endauth
                     <a href="{{ route('events.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('events.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Events</a>
                     <a href="{{ route('suggestions.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Suggestions</a>
-                    <a href="{{ route('chat.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Chat</a>
                     @auth
                         @if(auth()->user()->isAdmin())
                             <a href="{{ route('moderation.index') }}" class="px-3 py-2 rounded-lg {{ request()->routeIs('moderation.*') ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100' }}">Moderation</a>
@@ -78,11 +77,10 @@
             <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('posts.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('posts.index') }}">Posts</a>
             <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('polls.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('polls.index') }}">Polls</a>
             <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('suggestions.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('suggestions.index') }}">Suggestions</a>
-            <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('chat.index') }}">Chat</a>
             <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('listings.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('listings.index') }}">Marketplace</a>
             @auth
-                <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('contacts.index') }}">
-                    Contacts
+                <a class="block px-3 py-2 rounded-lg {{ request()->routeIs('contacts.*') || request()->routeIs('inquiries.*') || request()->routeIs('chat.*') ? 'bg-gray-900 text-white' : 'hover:bg-gray-100 text-gray-700' }}" href="{{ route('contacts.index') }}">
+                    Connect
                     @if(($contactUnreadCount ?? 0) > 0)
                         <span class="ml-1 text-xs bg-red-600 text-white rounded-full px-2 py-0.5">{{ $contactUnreadCount }}</span>
                     @endif
