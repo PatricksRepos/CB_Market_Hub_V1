@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -34,6 +35,24 @@ class User extends Authenticatable
         'is_admin' => 'boolean',
         'points_total' => 'integer',
     ];
+
+
+    public function getAvatarUrlAttribute($value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '/storage/')) {
+            return $value;
+        }
+
+        if (str_starts_with($value, 'storage/')) {
+            return '/'.$value;
+        }
+
+        return Storage::url($value);
+    }
 
     public function isAdmin(): bool
     {
