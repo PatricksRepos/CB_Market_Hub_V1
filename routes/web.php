@@ -158,6 +158,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/marketplace/{listing}/contact', [ListingInquiryController::class, 'start'])->middleware('throttle:inquiries')->name('contacts.start');
     Route::post('/marketplace/{listing}/inquire', [ListingInquiryController::class, 'start'])->middleware('throttle:inquiries')->name('inquiries.start'); // backward-compatible alias
+    Route::post('/posts/{post}/contact-seller', [ListingInquiryController::class, 'startFromPost'])->middleware('throttle:inquiries')->name('contacts.start.post');
 
     Route::get('/contacts/{inquiry}', [ListingInquiryController::class, 'show'])->name('contacts.show');
     Route::get('/inquiries/{inquiry}', [ListingInquiryController::class, 'show'])->name('inquiries.show'); // backward-compatible alias

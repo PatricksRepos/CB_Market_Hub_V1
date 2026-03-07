@@ -48,7 +48,7 @@
                 </a>
             @empty
                 <div class="bg-white rounded-lg border p-6 text-gray-600">
-                    No contacts yet. Open any marketplace listing and click <strong>Contact Seller (Private)</strong>.
+                    No contacts yet. Open any marketplace listing and click <strong>Message Seller</strong>.
                 </div>
             @endforelse
 

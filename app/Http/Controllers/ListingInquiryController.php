@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Listing;
 use App\Models\ListingInquiry;
+use App\Models\Post;
 use App\Notifications\SimpleNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -39,7 +40,13 @@ class ListingInquiryController extends Controller
 
         $user = $request->user();
 
-        abort_if($listing->user_id === $user->id, 422, 'You cannot inquire on your own listing.');
+        if ((int) $listing->user_id === (int) $user->id) {
+            return back()->with('status', 'You cannot start a private contact thread on your own listing.');
+        }
+
+        if (! $listing->is_active || ! $listing->user_id) {
+            return back()->with('status', 'That listing is unavailable for private contact right now.');
+        }
 
         $inquiry = ListingInquiry::firstOrCreate(
             [
@@ -55,8 +62,9 @@ class ListingInquiryController extends Controller
             'body' => ['nullable', 'string', 'max:1500'],
         ]);
 
+        $initialMessage = trim((string) ($data['body'] ?? ''));
+
         if (! $inquiry->messages()->exists()) {
-            $initialMessage = trim((string) ($data['body'] ?? ''));
             $seedMessage = $inquiry->messages()->create([
                 'sender_user_id' => $user->id,
                 'body' => $initialMessage !== ''
@@ -74,11 +82,57 @@ class ListingInquiryController extends Controller
                 route('contacts.show', $inquiry),
                 $user->name.' sent: '.Str::limit($seedMessage->body, 80)
             ));
+        } elseif ($initialMessage !== '') {
+            $message = $inquiry->messages()->create([
+                'sender_user_id' => $user->id,
+                'body' => $initialMessage,
+            ]);
+
+            $inquiry->forceFill([
+                'last_message_at' => now(),
+                'buyer_last_read_at' => now(),
+            ])->save();
+
+            if ((int) $inquiry->seller_user_id !== (int) $user->id) {
+                $listing->user?->notify(new SimpleNotification(
+                    'New private contact message',
+                    route('contacts.show', $inquiry),
+                    $user->name.' sent: '.Str::limit($message->body, 80)
+                ));
+            }
         }
 
         return redirect()
             ->route('contacts.show', $inquiry)
             ->with('status', 'Private contact thread ready. Keep marketplace deal details here.');
+    }
+
+
+    public function startFromPost(Request $request, Post $post)
+    {
+        if (! $this->inquiryTablesExist()) {
+            return back()->with('status', 'Sales inquiries are not ready yet. Run: php artisan migrate');
+        }
+
+        if ($post->is_hidden || $post->type !== 'marketplace' || ! $post->user_id || $post->is_anonymous) {
+            return back()->with('status', 'This seller cannot be contacted privately from this post.');
+        }
+
+        $listing = Listing::query()->firstOrCreate(
+            [
+                'user_id' => $post->user_id,
+                'title' => $post->title,
+                'category' => $post->marketplace_action ?: 'general',
+            ],
+            [
+                'body' => $post->body,
+                'price_cents' => $post->price !== null ? (int) round(((float) $post->price) * 100) : null,
+                'location' => $post->location,
+                'is_active' => true,
+            ]
+        );
+
+        return $this->start($request, $listing);
     }
 
     public function show(Request $request, ListingInquiry $inquiry)

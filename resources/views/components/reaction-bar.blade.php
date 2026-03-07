@@ -19,33 +19,36 @@
 @endphp
 
 @if ($reactionsEnabled)
-<div class="mt-4 flex flex-wrap items-center gap-2">
-    @foreach ($allowedEmojis as $emoji)
-        @php
-            $isSelected = $myReaction === $emoji;
-            $count = (int) ($reactionCounts[$emoji] ?? 0);
-        @endphp
+<div class="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-3">
+    <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Reactions</div>
+    <div class="flex flex-wrap items-center gap-2">
+        @foreach ($allowedEmojis as $emoji)
+            @php
+                $isSelected = $myReaction === $emoji;
+                $count = (int) ($reactionCounts[$emoji] ?? 0);
+            @endphp
 
-        @auth
-            <form method="POST" action="{{ route('reactions.store') }}">
-                @csrf
-                <input type="hidden" name="type" value="{{ $type }}">
-                <input type="hidden" name="id" value="{{ $model->id }}">
-                <input type="hidden" name="emoji" value="{{ $emoji }}">
-                <button
-                    type="submit"
-                    class="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-sm {{ $isSelected ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50' }}"
-                >
-                    <span>{{ $emoji }}</span>
-                    <span class="text-xs">{{ $count }}</span>
-                </button>
-            </form>
-        @else
-            <a href="{{ route('login') }}" class="inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-2.5 py-1 text-sm text-gray-700 hover:bg-gray-50">
-                <span>{{ $emoji }}</span>
-                <span class="text-xs">{{ $count }}</span>
-            </a>
-        @endauth
-    @endforeach
+            @auth
+                <form method="POST" action="{{ route('reactions.store') }}">
+                    @csrf
+                    <input type="hidden" name="type" value="{{ $type }}">
+                    <input type="hidden" name="id" value="{{ $model->id }}">
+                    <input type="hidden" name="emoji" value="{{ $emoji }}">
+                    <button
+                        type="submit"
+                        class="inline-flex min-w-[64px] items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium shadow-sm transition {{ $isSelected ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-200 bg-white text-gray-700 hover:border-indigo-300 hover:text-indigo-700 hover:shadow' }}"
+                    >
+                        <span class="text-base leading-none">{{ $emoji }}</span>
+                        <span class="rounded-full bg-black/5 px-1.5 py-0.5 text-xs {{ $isSelected ? 'bg-white/20 text-white' : 'text-gray-600' }}">{{ $count }}</span>
+                    </button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="inline-flex min-w-[64px] items-center justify-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition hover:border-indigo-300 hover:text-indigo-700 hover:shadow">
+                    <span class="text-base leading-none">{{ $emoji }}</span>
+                    <span class="rounded-full bg-black/5 px-1.5 py-0.5 text-xs text-gray-600">{{ $count }}</span>
+                </a>
+            @endauth
+        @endforeach
+    </div>
 </div>
 @endif

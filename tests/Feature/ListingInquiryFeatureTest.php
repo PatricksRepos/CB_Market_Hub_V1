@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Listing;
 use App\Models\ListingInquiry;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -39,6 +40,33 @@ class ListingInquiryFeatureTest extends TestCase
         $this->assertCount(1, $inquiry->messages);
         $this->assertNotNull($inquiry->buyer_last_read_at);
         $this->assertNull($inquiry->seller_last_read_at);
+    }
+
+
+    public function test_buyer_can_message_seller_directly_from_marketplace_post(): void
+    {
+        $seller = User::factory()->create();
+        $buyer = User::factory()->create();
+
+        $post = Post::query()->create([
+            'user_id' => $seller->id,
+            'type' => 'marketplace',
+            'title' => 'Selling mobile radio',
+            'body' => 'Works great.',
+            'marketplace_action' => 'sell',
+            'is_anonymous' => false,
+        ]);
+
+        $this->actingAs($buyer)
+            ->post(route('contacts.start.post', $post))
+            ->assertRedirect();
+
+        $inquiry = ListingInquiry::query()->first();
+
+        $this->assertNotNull($inquiry);
+        $this->assertSame($buyer->id, $inquiry->buyer_user_id);
+        $this->assertSame($seller->id, $inquiry->seller_user_id);
+        $this->assertCount(1, $inquiry->messages);
     }
 
     public function test_buyer_can_include_initial_message_when_starting_inquiry(): void
@@ -77,11 +105,53 @@ class ListingInquiryFeatureTest extends TestCase
         ]);
 
         $this->actingAs($seller)
+            ->from(route('listings.show', $listing))
             ->post(route('contacts.start', $listing))
-            ->assertStatus(422);
+            ->assertRedirect(route('listings.show', $listing));
+
+        $this->assertSame(
+            'You cannot start a private contact thread on your own listing.',
+            session('status')
+        );
 
         $this->assertSame(0, ListingInquiry::query()->count());
     }
+
+    public function test_starting_contact_with_existing_thread_adds_message_when_provided(): void
+    {
+        $seller = User::factory()->create();
+        $buyer = User::factory()->create();
+
+        $listing = Listing::query()->create([
+            'user_id' => $seller->id,
+            'title' => 'Desk mic',
+            'category' => 'sell',
+            'is_active' => true,
+        ]);
+
+        $inquiry = ListingInquiry::query()->create([
+            'listing_id' => $listing->id,
+            'buyer_user_id' => $buyer->id,
+            'seller_user_id' => $seller->id,
+            'last_message_at' => now(),
+        ]);
+
+        $inquiry->messages()->create([
+            'sender_user_id' => $buyer->id,
+            'body' => 'Initial message.',
+        ]);
+
+        $this->actingAs($buyer)
+            ->post(route('contacts.start', $listing), ['body' => 'Following up with an offer.'])
+            ->assertRedirect(route('contacts.show', $inquiry));
+
+        $this->assertDatabaseHas('listing_inquiry_messages', [
+            'listing_inquiry_id' => $inquiry->id,
+            'sender_user_id' => $buyer->id,
+            'body' => 'Following up with an offer.',
+        ]);
+    }
+
 
     public function test_only_inquiry_participants_can_view_and_message_thread(): void
     {
