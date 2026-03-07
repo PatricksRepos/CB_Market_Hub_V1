@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Listing;
 use App\Models\ListingInquiry;
+use App\Models\Post;
 use App\Notifications\SimpleNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -104,6 +105,34 @@ class ListingInquiryController extends Controller
         return redirect()
             ->route('contacts.show', $inquiry)
             ->with('status', 'Private contact thread ready. Keep marketplace deal details here.');
+    }
+
+
+    public function startFromPost(Request $request, Post $post)
+    {
+        if (! $this->inquiryTablesExist()) {
+            return back()->with('status', 'Sales inquiries are not ready yet. Run: php artisan migrate');
+        }
+
+        if ($post->is_hidden || $post->type !== 'marketplace' || ! $post->user_id || $post->is_anonymous) {
+            return back()->with('status', 'This seller cannot be contacted privately from this post.');
+        }
+
+        $listing = Listing::query()->firstOrCreate(
+            [
+                'user_id' => $post->user_id,
+                'title' => $post->title,
+                'category' => $post->marketplace_action ?: 'general',
+            ],
+            [
+                'body' => $post->body,
+                'price_cents' => $post->price !== null ? (int) round(((float) $post->price) * 100) : null,
+                'location' => $post->location,
+                'is_active' => true,
+            ]
+        );
+
+        return $this->start($request, $listing);
     }
 
     public function show(Request $request, ListingInquiry $inquiry)

@@ -54,7 +54,7 @@
                             @if(auth()->id() !== $l->user_id)
                                 <form method="POST" action="{{ route('contacts.start', $l) }}">
                                     @csrf
-                                    <button type="submit" class="inline-flex items-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Contact Seller (Private)</button>
+                                    <button type="submit" class="inline-flex items-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Message Seller</button>
                                 </form>
                             @endif
                         @else
@@ -93,12 +93,12 @@
 
                         <div class="mt-3 flex flex-wrap items-center gap-2">
                             <a href="{{ route('posts.show', $post) }}" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">View post</a>
-                            @if(!$post->is_anonymous && !empty($marketPostContactListingIds[$post->id]))
+                            @if(!$post->is_anonymous && $post->user_id)
                                 @auth
                                     @if(auth()->id() !== $post->user_id)
-                                        <form method="POST" action="{{ route('contacts.start', $marketPostContactListingIds[$post->id]) }}">
+                                        <form method="POST" action="{{ route('contacts.start.post', $post) }}">
                                             @csrf
-                                            <button type="submit" class="inline-flex items-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Message Seller (Private)</button>
+                                            <button type="submit" class="inline-flex items-center rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800">Message Seller</button>
                                         </form>
                                     @endif
                                 @else

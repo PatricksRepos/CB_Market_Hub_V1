@@ -127,7 +127,7 @@ class MarketplacePostFeedVisibilityTest extends TestCase
         $response = $this->actingAs($buyer)->get(route('listings.index'));
 
         $response->assertOk();
-        $response->assertSeeText('Message Seller (Private)');
+        $response->assertSeeText('Message Seller');
     }
 
     public function test_invalid_marketplace_category_falls_back_to_default_filter(): void

@@ -1,80 +1,85 @@
 <x-app-layout>
   <x-slot name="header">
-    <h2 class="font-semibold text-xl">Cape Breton Community Marketplace</h2>
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="font-semibold text-xl text-gray-900">Cape Breton Community Marketplace</h2>
+      <span class="hidden sm:inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">Fresh posts daily</span>
+    </div>
   </x-slot>
 
-  <div class="p-6 space-y-4">
-    <div class="flex items-center gap-4">
+  <div class="p-6 space-y-5">
+    <div class="flex flex-wrap items-center gap-2">
       @auth
-        <a class="underline" href="{{ route('posts.create') }}">Create Post</a>
+        <a class="inline-flex items-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800" href="{{ route('posts.create') }}">+ Create Post</a>
       @else
-        <a class="underline" href="{{ route('login') }}">Login to Post</a>
+        <a class="inline-flex items-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800" href="{{ route('login') }}">Login to Post</a>
       @endauth
 
-      <a class="underline" href="{{ route('polls.index') }}">Discussions (Polls)</a>
-      <a class="underline" href="/admin">Admin</a>
+      <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="{{ route('polls.index') }}">Discussions (Polls)</a>
+      <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="/admin">Admin</a>
     </div>
 
-    <form method="GET" class="flex flex-wrap gap-2 items-center">
-      <input name="q" value="{{ request('q') }}" placeholder="Search posts" class="border rounded px-3 py-1">
-      <select name="category" class="border rounded">
-        <option value="">All Categories</option>
-        @foreach($categories as $cat)
-          <option value="{{ $cat->id }}" @selected(request('category') == $cat->id)>{{ $cat->name }}</option>
-          @foreach($cat->children as $child)
-            <option value="{{ $child->id }}" @selected(request('category') == $child->id)>— {{ $child->name }}</option>
+    <form method="GET" class="rounded-xl border border-gray-200 bg-white p-3 sm:p-4 shadow-sm">
+      <div class="flex flex-wrap items-center gap-2">
+        <input name="q" value="{{ request('q') }}" placeholder="Search posts" class="min-w-[220px] flex-1 rounded-lg border-gray-300 px-3 py-2 text-sm focus:border-indigo-400 focus:ring-indigo-400">
+        <select name="category" class="rounded-lg border-gray-300 px-3 py-2 text-sm focus:border-indigo-400 focus:ring-indigo-400">
+          <option value="">All Categories</option>
+          @foreach($categories as $cat)
+            <option value="{{ $cat->id }}" @selected(request('category') == $cat->id)>{{ $cat->name }}</option>
+            @foreach($cat->children as $child)
+              <option value="{{ $child->id }}" @selected(request('category') == $child->id)>— {{ $child->name }}</option>
+            @endforeach
           @endforeach
-        @endforeach
-      </select>
+        </select>
 
-      <button class="px-3 py-1 border rounded">Filter</button>
+        <button class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Filter</button>
 
-      @if(request('category') || request('q'))
-        <a class="underline" href="{{ route('posts.index') }}">Clear</a>
-      @endif
+        @if(request('category') || request('q'))
+          <a class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="{{ route('posts.index') }}">Clear</a>
+        @endif
+      </div>
     </form>
 
-    <div class="space-y-3">
+    <div class="space-y-4">
       @forelse($posts as $post)
-        <div class="p-4 border rounded">
-          <div class="text-sm opacity-70">
+        <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div class="text-xs font-medium uppercase tracking-wide text-gray-500">
             {{ $post->type }}
             @if($post->category)
               • {{ $post->category->parent ? $post->category->parent->name.' › '.$post->category->name : $post->category->name }}
             @endif
-            @if($post->is_promoted) • PROMOTED @endif
+            @if($post->is_promoted) • Promoted @endif
           </div>
 
           <div class="mt-2 flex items-center gap-2 text-sm text-gray-600">
             @if($post->user?->avatar_url)
-              <img src="{{ $post->user->avatar_url }}" alt="{{ $post->user->name }} avatar" class="h-16 w-16 rounded-full object-cover border">
+              <img src="{{ $post->user->avatar_url }}" alt="{{ $post->user->name }} avatar" class="h-10 w-10 rounded-full object-cover border border-gray-200">
             @else
-              <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xs font-semibold">{{ strtoupper(substr($post->user?->name ?? 'U',0,1)) }}</div>
+              <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 text-xs font-semibold">{{ strtoupper(substr($post->user?->name ?? 'U',0,1)) }}</div>
             @endif
             <span>{{ $post->is_anonymous ? ($post->anonymous_name ?? 'Anon') : ($post->user?->name ?? 'User') }}</span>
             <span>• {{ $post->created_at->diffForHumans() }}</span>
           </div>
 
-          <a class="text-lg underline mt-2 inline-block" href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
+          <a class="mt-2 inline-block text-lg font-semibold text-gray-900 hover:text-indigo-700" href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
 
           @if($post->images->first())
-            <a href="{{ route('posts.show', $post) }}" class="block mt-2">
-              <div class="w-full max-w-xl rounded-lg border overflow-hidden bg-gray-100" style="height: 20rem;">
-                <img class="w-full h-full object-cover" style="width: 100%; height: 100%; object-fit: cover;" src="{{ asset('storage/'.$post->images->first()->path) }}" alt="Post image thumbnail">
+            <a href="{{ route('posts.show', $post) }}" class="block mt-3">
+              <div class="w-full max-w-xl overflow-hidden rounded-xl border border-gray-200 bg-gray-100" style="height: 20rem;">
+                <img class="h-full w-full object-cover" src="{{ asset('storage/'.$post->images->first()->path) }}" alt="Post image thumbnail">
               </div>
             </a>
           @endif
 
-          <div class="text-sm opacity-70 mt-2">
+          <div class="mt-3 text-sm text-gray-600">
             @if($post->marketplace_action)
-              {{ strtoupper($post->marketplace_action) }}
+              <span class="font-medium">{{ strtoupper($post->marketplace_action) }}</span>
             @endif
-            @if($post->location) {{ $post->location }} @endif
-            @if($post->price) • ${{ $post->price }} @endif
+            @if($post->location) <span class="ml-1">{{ $post->location }}</span> @endif
+            @if($post->price) <span class="ml-1">• ${{ $post->price }}</span> @endif
           </div>
         </div>
       @empty
-        <div class="p-4 border rounded opacity-70">No posts yet. Be the first to create one.</div>
+        <div class="rounded-xl border border-gray-200 bg-white p-4 text-gray-600">No posts yet. Be the first to create one.</div>
       @endforelse
     </div>
 

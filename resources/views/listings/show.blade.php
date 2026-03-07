@@ -59,7 +59,7 @@
                                 @error('body')
                                     <p class="text-sm text-red-600">{{ $message }}</p>
                                 @enderror
-                                <button type="submit" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Contact Seller (Private)</button>
+                                <button type="submit" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Message Seller</button>
                             </form>
                             <a href="{{ route('chat.index') }}" class="inline-flex items-center rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">Open Community Chat (Public)</a>
                         </div>

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Listing;
 use App\Models\ListingInquiry;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -39,6 +40,33 @@ class ListingInquiryFeatureTest extends TestCase
         $this->assertCount(1, $inquiry->messages);
         $this->assertNotNull($inquiry->buyer_last_read_at);
         $this->assertNull($inquiry->seller_last_read_at);
+    }
+
+
+    public function test_buyer_can_message_seller_directly_from_marketplace_post(): void
+    {
+        $seller = User::factory()->create();
+        $buyer = User::factory()->create();
+
+        $post = Post::query()->create([
+            'user_id' => $seller->id,
+            'type' => 'marketplace',
+            'title' => 'Selling mobile radio',
+            'body' => 'Works great.',
+            'marketplace_action' => 'sell',
+            'is_anonymous' => false,
+        ]);
+
+        $this->actingAs($buyer)
+            ->post(route('contacts.start.post', $post))
+            ->assertRedirect();
+
+        $inquiry = ListingInquiry::query()->first();
+
+        $this->assertNotNull($inquiry);
+        $this->assertSame($buyer->id, $inquiry->buyer_user_id);
+        $this->assertSame($seller->id, $inquiry->seller_user_id);
+        $this->assertCount(1, $inquiry->messages);
     }
 
     public function test_buyer_can_include_initial_message_when_starting_inquiry(): void
