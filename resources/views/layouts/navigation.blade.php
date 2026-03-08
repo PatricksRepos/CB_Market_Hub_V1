@@ -53,7 +53,7 @@
 
                         <a class="text-sm px-2.5 py-1.5 rounded-md border text-indigo-700 hover:bg-indigo-50" href="{{ route('profiles.edit') }}">Edit Profile</a>
 
-                        <button type="button" onclick="toggleThemeMode()" class="text-sm px-2.5 py-1.5 rounded-md border text-indigo-700 hover:bg-indigo-50">
+                        <button type="button" data-theme-toggle class="text-sm px-2.5 py-1.5 rounded-md border text-indigo-700 hover:bg-indigo-50">
                             <span data-theme-toggle-label>Light mode</span>
                         </button>
 
@@ -63,7 +63,7 @@
                         </form>
                     </div>
                 @else
-                    <button type="button" onclick="toggleThemeMode()" class="text-sm px-2.5 py-1.5 rounded-md border text-indigo-700 hover:bg-indigo-50">
+                    <button type="button" data-theme-toggle class="text-sm px-2.5 py-1.5 rounded-md border text-indigo-700 hover:bg-indigo-50">
                         <span data-theme-toggle-label>Light mode</span>
                     </button>
                     <a href="{{ route('login') }}" class="text-sm text-indigo-700 hover:underline">Log in</a>
@@ -84,7 +84,7 @@
 
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t">
         <div class="pt-2 pb-3 space-y-1 px-4">
-            <button type="button" onclick="toggleThemeMode()" class="block w-full text-left px-2.5 py-1.5 rounded-md border text-indigo-700 hover:bg-indigo-50">
+            <button type="button" data-theme-toggle class="block w-full text-left px-2.5 py-1.5 rounded-md border text-indigo-700 hover:bg-indigo-50">
                 <span data-theme-toggle-label>Light mode</span>
             </button>
 

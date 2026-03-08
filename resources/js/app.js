@@ -44,12 +44,26 @@ function updateThemeToggleLabels() {
     });
 }
 
+function bindThemeToggleButtons() {
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+        if (button.dataset.themeToggleBound === 'true') {
+            return;
+        }
+
+        button.dataset.themeToggleBound = 'true';
+        button.addEventListener('click', () => {
+            window.toggleThemeMode();
+        });
+    });
+}
+
 function initializeTheme() {
     const storedTheme = getStoredTheme();
     const initialTheme = storedTheme || getSystemTheme();
 
     applyTheme(initialTheme);
     updateThemeToggleLabels();
+    bindThemeToggleButtons();
 }
 
 

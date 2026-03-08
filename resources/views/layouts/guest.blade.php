@@ -29,7 +29,7 @@
     <body class="font-sans antialiased" style="color: var(--text-main);">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0" style="background: linear-gradient(135deg, var(--app-bg-top) 0%, var(--app-bg-bottom) 100%);">
             <div class="w-full max-w-md flex justify-end px-4 sm:px-0">
-                <button type="button" onclick="toggleThemeMode()" class="text-sm px-3 py-2 rounded-lg border text-indigo-700 hover:bg-indigo-50">
+                <button type="button" data-theme-toggle class="text-sm px-3 py-2 rounded-lg border text-indigo-700 hover:bg-indigo-50">
                     <span data-theme-toggle-label>Dark mode</span>
                 </button>
             </div>
